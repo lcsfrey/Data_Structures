@@ -46,15 +46,16 @@ public:
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//DEFINITIONS
+// DEFINITIONS
 ////////////////////////////////////////////////////////////////////////////////////////
-
+// initializes empty ListNode
 template<class T>
 ListNode<T>::ListNode(){
     next = nullptr;
     prev = nullptr;
 }
 
+// initializes ListNode
 template<class T>
 ListNode<T>::ListNode(const T& value)
 {
@@ -63,6 +64,7 @@ ListNode<T>::ListNode(const T& value)
     prev = nullptr;
 }
 
+// initializes empty LinkedList
 template<class T>
 LinkedList<T>::LinkedList()
 {
@@ -75,6 +77,7 @@ LinkedList<T>::LinkedList()
     tail->next = nullptr;
 }
 
+// releases memory allocated by LinkedList
 template<class T>
 LinkedList<T>::~LinkedList(){
     ListNode<T>* current = head->next;
@@ -92,6 +95,8 @@ int LinkedList<T>::getLength() const{
     return length;
 }
 
+// Prints list in order in the form,
+// "Head -> data -> data -> data...."
 template<class T>
 void LinkedList<T>::print() const{
     ListNode<T>* current = head->next;
