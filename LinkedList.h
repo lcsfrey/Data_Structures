@@ -95,7 +95,7 @@ int LinkedList<T>::getLength() const{
     return length;
 }
 
-// Prints list in order in the form,
+// prints list in order in the form,
 // "Head -> data -> data -> data...."
 template<class T>
 void LinkedList<T>::print() const{
@@ -108,6 +108,7 @@ void LinkedList<T>::print() const{
     std::cout << current->data << std::endl;
 }
 
+// insert item at start of list
 template<class T>
 void LinkedList<T>::insertStart(const T &value){
     ListNode<T>* temp = new ListNode<T>(value);
@@ -118,6 +119,7 @@ void LinkedList<T>::insertStart(const T &value){
     length++;
 }
 
+// insert item at end of list
 template<class T>
 void LinkedList<T>::insertEnd(const T &value){
     ListNode<T>* temp = new ListNode<T>(value);
@@ -128,6 +130,9 @@ void LinkedList<T>::insertEnd(const T &value){
     length++;
 }
 
+// insert at certain length into list
+// adds to beginning if length is 0
+// adds to end if index is greater than length of list
 template<class T>
 void LinkedList<T>::insertAt(const T &value, const int index){
     if(index >= length){
@@ -152,6 +157,8 @@ void LinkedList<T>::insertAt(const T &value, const int index){
     }
 }
 
+// removes first item from array
+// returns copy of item that was deleted
 template<class T>
 T LinkedList<T>::removeFirst(){
     T temp_data = head->next->data;
@@ -164,6 +171,8 @@ T LinkedList<T>::removeFirst(){
     return temp_data;
 }
 
+// removes last item from array
+// returns copy of item that was deleted
 template<class T>
 T LinkedList<T>::removeLast(){
     T temp_data = tail->prev->data;
