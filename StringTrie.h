@@ -2,6 +2,7 @@
 #define STRINGTRIE_H
 #include <string>
 #include <iostream>
+#include <Queue>
 #include "LinkedList.h"
 
 //Dependecies: LinkedList.h from https://github.com/lcsfrey/Data_Structures
@@ -24,6 +25,8 @@ public:
     bool contains(std::string word);
     int getNumberTotalWords() const;
     int getNumberUniqueWords() const;
+    int getLengthOfShortestWord() const;
+    int getLengthOfLongestWord() const;
     void printAll();
     void printAllWithPrefix(std::string word);
     void printAllHelper(StringTrieNode* current, std::string word);
@@ -125,5 +128,34 @@ int StringTrie::getNumberUniqueWords() const{
     return number_of_unique_words;
 }
 
+// returns the length of the shortest word in trie
+int StringTrie::getLengthOfShortestWord() const{
+    std::queue<StringTrieNode*>* possible_words = new std::queue<StringTrieNode*>();
+    std::queue<int>* possible_words_paths = new std::queue<int>();
+    StringTrieNode* current_node;
+    int min_length = 0;
+    int current_node_possible_paths = 0;
+    int current_node_lenth = 0;
+    int words_left = 0;
+    possible_words->push(head);
+    while (possible_words->size() > 0){
+        current_node = possible_words->front();
+        possible_words->pop();
+        words_left = possible_words_paths->front();
+        possible_words_paths->pop();
+
+        current_node_possible_paths = 0;
+        for(int i = 0; i < 200; i++){
+            if(current_node[i].is_a_word){
+                return min_length;
+            }
+            if(current_node->paths[i] != nullptr){
+                current_node_possible_paths++;
+                possible_words_paths->push(current_node_lenth);
+                possible_words->push(current_node->paths[i]);
+            }
+        }
+    }
+}
 
 #endif // STRINGTRIE_H
