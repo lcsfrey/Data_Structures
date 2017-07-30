@@ -10,7 +10,7 @@
 struct StringTrieNode : ListNode<char>{
     bool is_a_word;
     int number_of_times_seen = 0;
-    StringTrieNode** paths = new StringTrieNode*[200]();
+    StringTrieNode** paths = new StringTrieNode*[26]();
     StringTrieNode(char input_char){
         is_a_word = false;
         data = input_char;
@@ -49,7 +49,7 @@ void StringTrie::addWord(std::string word){
     int index_of_char = -1;
     int size = word.length();
     for(int i = 0; i < size; i++){
-        index_of_char = tolower(c_string_word[i]);
+        index_of_char = tolower(c_string_word[i]) - 97;
         if(current_list[index_of_char] == nullptr){
             current_list[index_of_char] = new StringTrieNode(c_string_word[i]);
         }
@@ -97,7 +97,7 @@ void StringTrie::printAllWithPrefix( std::string word){
     int index_of_char = -1;
     int size = word.length();
     for(int i = 0; i < size; i++){
-        index_of_char = tolower(c_string_word[i]);
+        index_of_char = tolower(c_string_word[i]) - 97;
         if(current_list[index_of_char] == nullptr)
         {
             std::cout << "\nNo words with prefix: " << word << std::endl;
@@ -113,7 +113,7 @@ void StringTrie::printAllHelper(StringTrieNode* current, std::string word){
     if(current->is_a_word){
         std::cout << word + current->data << std::endl;
     }
-    for(int i = 0; i < 200; i++){
+    for(int i = 0; i < 26; i++){
         if(current->paths[i] != nullptr){
             printAllHelper(current->paths[i], word + current->data);
         }
