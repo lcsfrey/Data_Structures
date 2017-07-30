@@ -106,7 +106,7 @@ void StringTrie::printAllWithPrefix( std::string word){
         current_node = current_list[index_of_char];
         current_list = current_list[index_of_char]->paths;
     }
-    printAllHelper(current_node, "");
+    printAllHelper(current_node, word.substr(0, word.size()-1));
 }
 
 void StringTrie::printAllHelper(StringTrieNode* current, std::string word){
