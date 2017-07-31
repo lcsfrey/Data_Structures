@@ -2,7 +2,7 @@
 #define STRINGTRIE_H
 #include <string>
 #include <iostream>
-#include <Queue>
+#include <queue>
 #include "LinkedList.h"
 
 //Dependecies: LinkedList.h from https://github.com/lcsfrey/Data_Structures
