@@ -57,8 +57,7 @@ ListNode<T>::ListNode(){
 
 // initializes ListNode
 template<class T>
-ListNode<T>::ListNode(const T& value)
-{
+ListNode<T>::ListNode(const T& value){
     data = value;
     next = nullptr;
     prev = nullptr;
@@ -66,23 +65,39 @@ ListNode<T>::ListNode(const T& value)
 
 // initializes empty LinkedList
 template<class T>
-LinkedList<T>::LinkedList()
-{
+LinkedList<T>::LinkedList(){
     head = new ListNode<T>();
     tail = new ListNode<T>();
     length = 0;
     head->next = tail;
     tail->prev = head;
-    head->prev = nullptr;
-    tail->next = nullptr;
+}
+
+// copy constructor
+// initializes new LinkedList as a deep copy of existing LinkedList
+template<class T>
+LinkedList<T>::LinkedList(const LinkedList& other_list){
+    ListNode<T>* other_node = other_list.head->next;
+    ListNode<T>* current = head;
+    head = new ListNode<T>();
+    tail = new ListNode<T>();
+    current = current->next;
+    while (other_node != other_list.tail){
+        current->next = new ListNode<T>(other_node->data);
+        current->next->prev = current;
+        current = current->next;
+        other_node = other_node->next;
+    }
+    current->next = tail;
+    tail->prev = current;
+    other_list.length;
 }
 
 // releases memory allocated by LinkedList
 template<class T>
 LinkedList<T>::~LinkedList(){
     ListNode<T>* current = head->next;
-    while(current != tail)
-    {
+    while(current != tail){
         delete current->prev;
         current = current->next;
     }
@@ -168,6 +183,7 @@ T LinkedList<T>::removeFirst(){
         head->next->prev = head;
         delete to_delete;
     }
+    length--;
     return temp_data;
 }
 
@@ -182,6 +198,7 @@ T LinkedList<T>::removeLast(){
         tail->prev->next = tail;
         delete to_delete;
     }
+    length--;
     return temp_data;
 }
 
