@@ -7,10 +7,11 @@
 using namespace std;
 
 void TrieTest();
+void BinaryTreeTest();
 
 int main()
 {
-    TrieTest();
+   BinaryTreeTest();
 }
 
 void TrieTest(){
@@ -18,6 +19,9 @@ void TrieTest(){
 
     ifstream myFile;
     myFile.open("GreatExpectations.txt");
+    if(!myFile.is_open()){
+        cout << "File in TrieTest() didn't open!\n";
+    }
     int wordCount = 1;
     int pageCount = 1;
     int choice = -1;
@@ -60,6 +64,8 @@ void TrieTest(){
     cin >> choice;
     cout << endl;
     switch(choice){
+        case 0:
+            break;
         case 1:
             book.printAll();
             break;
@@ -69,7 +75,7 @@ void TrieTest(){
             book.printAllWithPrefix(tempWord);
             break;
         case 3:
-            cout << "Enter prefix: ";
+            cout << "Enter word to search for: ";
             cin >> tempWord;
             if(book.contains(tempWord)){
                 std::cout << tempWord << " is in the trie\n";
@@ -89,4 +95,57 @@ void TrieTest(){
     }
 }
 
+void BinaryTreeTest(){
+
+    BinaryTree<int> myBinaryTree;
+    int choice = -1;
+    int tree_input = 0;
+
+    while(choice != 0)
+    {
+        cout << "\n----------------Binary Tree Test----------------" << endl;
+        cout << "Select test method:\n";
+        cout << "0 - Exit\n";
+        cout << "1 - Add element\n";
+        cout << "2 - Remove element\n";
+        cout << "3 - Find element\n";
+        cout << "4 - Get smallest element\n";
+        cout << "5 - Get largest element\n";
+        cin >> choice;
+        cout << endl;
+        switch(choice){
+            case 0:
+                break;
+            case 1:
+                cout << "Input element to add: ";
+                cin >> tree_input;
+                myBinaryTree.insert(tree_input);
+                break;
+            case 2:
+                cout << "Input element to remove: ";
+                cin >> tree_input;
+                myBinaryTree.remove(tree_input);
+                break;
+            case 3:
+                cout << "Enter element to search for: ";
+                cin >> tree_input;
+                if(myBinaryTree.contains(tree_input)){
+                    cout << tree_input << " is in the tree\n";
+                }
+                else{
+                    cout << tree_input << " is not in the tree\n";
+                }
+                break;
+            case 4:
+                cout << "Smallest element in tree: " << myBinaryTree.getSmallest();
+                break;
+            case 5:
+                cout << "Largest element in tree: " << myBinaryTree.getLargest();
+                break;
+            default:
+                cout << "Invalid choice!\n";
+                break;
+        }
+    }
+}
 
