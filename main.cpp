@@ -8,90 +8,92 @@ using namespace std;
 
 void TrieTest();
 void BinaryTreeTest();
+void storeBookInTrie(StringTrie &book);
 
 int main()
 {
-   BinaryTreeTest();
+   cout << "----------------Data Structures----------------" << endl;
+   cout << "-----------------By Lucas Frey-----------------" << endl;
+   int choice = -1;
+   while(choice != 0)
+   {
+       cout << "Select data structure:\n";
+       cout << "0 - Exit\n";
+       cout << "1 - String Trie\n";
+       cout << "2 - Binary Tree\n";
+       cin >> choice;
+       cout << endl;
+       switch(choice){
+           case 0:
+               break;
+           case 1:
+               TrieTest();
+               break;
+           case 2:
+               BinaryTreeTest();
+               break;
+           default:
+               cout << "Invalid choice!\n";
+               break;
+       }
+   }
 }
 
 void TrieTest(){
-    cout << "\n----------------Trie Stats----------------" << endl;
-
-    ifstream myFile;
-    myFile.open("GreatExpectations.txt");
-    if(!myFile.is_open()){
-        cout << "File in TrieTest() didn't open!\n";
-    }
-    int wordCount = 1;
-    int pageCount = 1;
     int choice = -1;
-    char c;
-    string tempWord;
+    string temp_word = "";
     StringTrie book;
-    clock_t start = clock();
-    while(!myFile.eof())
+    while(choice != 0)
     {
-        myFile >> tempWord;
-        if(tempWord == "----------------------------------------")
-        {
-            pageCount++;
-            wordCount = 1;
+        cout << "----------------Trie Test----------------" << endl;
+        cout << "Select test method:\n";
+        cout << "0 - Exit\n";
+        cout << "1 - Import book\n";
+        cout << "2 - Add word\n";
+        cout << "3 - Print all\n";
+        cout << "4 - Print all with prefix\n";
+        cout << "5 - Search for word in trie\n";
+        cout << "6 - Get length of shortest word\n";
+        cin >> choice;
+        printf("\r");
+        switch(choice){
+            case 0:
+                break;
+            case 1:
+                storeBookInTrie(book);
+            break;
+            case 2:
+                cout << "Enter word to add: ";
+                cin >> temp_word;
+                book.addWord(temp_word);
+            break;
+            case 3:
+                book.printAll();
+                break;
+            case 4:
+                cout << "Enter prefix: ";
+                cin >> temp_word;
+                book.printAllWithPrefix(temp_word);
+                break;
+            case 5:
+                cout << "Enter word to search for: ";
+                cin >> temp_word;
+                if(book.contains(temp_word)){
+                    std::cout << temp_word << " is in the trie\n";
+                }
+                else{
+                    std::cout << temp_word << " is not in the trie\n";
+                }
+                break;
+            case 6:
+                cout << "Length of shortest word is: " << book.getLengthOfShortestWord() << endl;
+                break;
+            case 7:
+                break;
+            default:
+                cout << "Invalid choice!\n";
+                break;
         }
-        else
-        {
-            c = tempWord[0];
-            if(c < 90 && c > 63)
-            {
-                c = c + 32;
-            }
-            tempWord = c + tempWord.substr(1, tempWord.size() - 1);
-            book.addWord(tempWord);
-            wordCount++;
-        }
-    }
-    clock_t duration = clock() - start;
-    myFile.close();
-
-    cout << "Time taken to build index: " << duration / (double)CLOCKS_PER_SEC << " seconds." << endl;
-    cout << "Number of unique keys in index: " << book.getNumberUniqueWords() << endl;
-    cout << "Number of total keys in index: " << book.getNumberTotalWords() << endl;
-
-    cout << "\n----------------Trie Test----------------" << endl;
-    cout << "Select test method:\n";
-    cout << "1 - Print all\n";
-    cout << "2 - Print all with prefix\n";
-    cout << "3 - Search for word in trie\n";
-    cin >> choice;
-    cout << endl;
-    switch(choice){
-        case 0:
-            break;
-        case 1:
-            book.printAll();
-            break;
-        case 2:
-            cout << "Enter prefix: ";
-            cin >> tempWord;
-            book.printAllWithPrefix(tempWord);
-            break;
-        case 3:
-            cout << "Enter word to search for: ";
-            cin >> tempWord;
-            if(book.contains(tempWord)){
-                std::cout << tempWord << " is in the trie\n";
-            }
-            else{
-                std::cout << tempWord << " is not in the trie\n";
-            }
-            break;
-        case 4:
-            cout << "Results written to file...\n";
-            break;
-        case 5:
-            break;
-        default:
-            cout << "Invalid choice!\n";
-            break;
     }
 }
 
@@ -103,7 +105,7 @@ void BinaryTreeTest(){
 
     while(choice != 0)
     {
-        cout << "\n----------------Binary Tree Test----------------" << endl;
+        cout << "----------------Binary Tree Test----------------" << endl;
         cout << "Select test method:\n";
         cout << "0 - Exit\n";
         cout << "1 - Add element\n";
@@ -149,3 +151,37 @@ void BinaryTreeTest(){
     }
 }
 
+void storeBookInTrie(StringTrie &book){
+
+    ifstream myFile;
+    myFile.open("words.txt");
+    if(!myFile.is_open()){
+        cout << "File in TrieTest() didn't open!\n";
+    }
+    int wordCount = 1;
+    int pageCount = 1;
+    char c;
+    string temp_word;
+    clock_t start = clock();
+    while(!myFile.eof()){
+        myFile >> temp_word;
+        if(temp_word == "----------------------------------------"){
+            pageCount++;
+            wordCount = 1;
+        }
+        else{
+            c = temp_word[0];
+            if(c < 90 && c > 63){
+                c = c + 32;
+            }
+            temp_word = c + temp_word.substr(1, temp_word.size() - 1);
+            book.addWord(temp_word);
+            wordCount++;
+        }
+    }
+    clock_t duration = clock() - start;
+    myFile.close();
+    cout << "Time taken to build trie: " << duration / (double)CLOCKS_PER_SEC << " seconds." << endl;
+    cout << "Number of unique keys in trie: " << book.getNumberUniqueWords() << endl;
+    cout << "Number of total keys in trie: " << book.getNumberTotalWords() << endl;
+}
