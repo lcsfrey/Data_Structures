@@ -24,8 +24,8 @@
 **                                                                                 **
 ************************************************************************************/
 
-#ifndef LinkedList_H_
-#define LinkedList_H_
+#ifndef LINKEDLIST_H_
+#define LINKEDLIST_H_
 
 #include<iostream>
 
@@ -39,7 +39,7 @@ struct ListNode {
     ListNode<T>* next;
     ListNode<T>* prev;
     ListNode();
-    ListNode(const T& value);
+    explicit ListNode(const T& value);
 };
 
 template<class T>
@@ -231,7 +231,6 @@ T LinkedList<T>::removeLast() {
 // removes the last element if the index is greater than the length of the list
 template<class T>
 T LinkedList<T>::removeAt(const int index) {
-
     if (index >= length) {
         return removeLast();
     } else if (index == 0) {
@@ -253,10 +252,10 @@ T LinkedList<T>::removeAt(const int index) {
 }
 
 template<class T>
-bool LinkedList<T>::contains(const T &value){
+bool LinkedList<T>::contains(const T &value) {
     ListNode<T>* current = head->next;
-    while(current != tail){
-        if(current->data == value){
+    while (current != tail) {
+        if (current->data == value) {
             return true;
         }
         current = current->next;
@@ -265,12 +264,12 @@ bool LinkedList<T>::contains(const T &value){
 }
 
 template<class T>
-T LinkedList<T>::getFirst(){
+T LinkedList<T>::getFirst() {
     return head->next->data;
 }
 
 template<class T>
-T LinkedList<T>::getLast(){
+T LinkedList<T>::getLast() {
     return tail->prev->data;
 }
 
@@ -291,4 +290,4 @@ T LinkedList<T>::getItemAt(const int index) {
     }
 }
 
-#endif  // LinkedList_H_
+#endif  // LINKEDLIST_H_

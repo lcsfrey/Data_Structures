@@ -33,7 +33,6 @@
 // DECLARATIONS
 ////////////////////////////////////////////////////////////////////////////////////////
 
-
 template<class T>
 struct TreeNode {
     T data;
@@ -48,18 +47,19 @@ template<class T>
 class BinaryTree {
  public:
     BinaryTree();
-    BinaryTree(const BinaryTree &other_tree);
+    explicit BinaryTree(const BinaryTree &other_tree);
     void insert(const T& value);
     bool contains(const T& value);
-    T getLargest();
-    T getSmallest();
+    inline T getLargest();
+    inline T getSmallest();
     void remove(const T& value);
     void removeLargest();
     void removeSmallest();
     void printAll();
-    void print(TreeNode<T>* current);
+
  private:
     TreeNode<T>* root;
+    inline void print(TreeNode<T>* current);
     T getLargest(TreeNode<T>* current);
     T getSmallest(TreeNode<T>* current);
     void removeLargest(TreeNode<T>* current);
@@ -244,9 +244,8 @@ bool BinaryTree<T>::contains(const T &value) {
     }
     TreeNode<T>* current = root;
     while (current != nullptr) {
-        if (current->data == value) {
-            return true;
-        } else if (current->data > value) {
+        if (current->data == value) return true;
+        else if (current->data > value) {
             current = current->left;
         } else {
             current = current->right;
@@ -258,9 +257,10 @@ bool BinaryTree<T>::contains(const T &value) {
 template<class T>
 void BinaryTree<T>::printAll() {
     print(root);
+    std::cout << std::endl;
 }
 
-// prints current's left (smaller) descendents
+// prints current's left descendents
 // then prints current
 // then prints current's right descendents
 
@@ -270,7 +270,7 @@ void BinaryTree<T>::print(TreeNode<T> *current) {
         return;
     }
     print(current->left);
-    std::cout << current->data << ", ";
+    std::cout << current->data << " ";
     print(current->right);
 }
 
