@@ -35,8 +35,6 @@
 
 struct StringTrieNode {
     explicit StringTrieNode(char input_char) : data(input_char) {}
-
-    // BUG: currently not deallocating memory correctly
     ~StringTrieNode();
     bool is_a_word = false;
     char data;
@@ -53,7 +51,7 @@ class StringTrie {
     void addWord(const std::string &word);
 
     void remove(const std::string &word);
-    void removeSubtrie(const std::string &word);
+    void removeAllWithPrefix(const std::string &word);
 
     bool contains(const std::string &word);
 
@@ -64,9 +62,10 @@ class StringTrie {
 
     void printAll();
     void printAllWithPrefix(const std::string &word);
-    void printAllHelper(StringTrieNode* current, std::string word);
 
  private:
+    void printAllHelper(StringTrieNode* current, std::string word);
+
     StringTrieNode* head;
     int number_of_total_words = 0;
     int number_of_unique_words = 0;

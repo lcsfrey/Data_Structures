@@ -24,7 +24,7 @@
 **                                                                                 **
 ************************************************************************************/
 
-#include "StringTrie.h"
+#include "stringtrie.h"
 
 #include <vector>
 #include <queue>
@@ -67,6 +67,7 @@ void StringTrie::addWord(const std::string &word) {
         std::map<char, StringTrieNode*>::const_iterator found(current_map->find(key_char));
         if (found == current_map->end()) {
             StringTrieNode* t_node_pointer = new StringTrieNode(key_char);
+            t_node_pointer->parent = current_node;
             std::pair<char, StringTrieNode*> t_pair(key_char, t_node_pointer);
             current_map->insert(t_pair);
         }
@@ -136,7 +137,7 @@ void StringTrie::remove(const std::string &word) {
     }
 }
 
-void StringTrie::removeSubtrie(const std::string &word) {
+void StringTrie::removeAllWithPrefix(const std::string &word) {
     std::map<char, StringTrieNode*>* current_map = &head->m_paths;
     StringTrieNode* current_node = head;
     const char* c_string_word = word.c_str();
