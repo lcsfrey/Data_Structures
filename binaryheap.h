@@ -24,8 +24,8 @@
 **                                                                                 **
 ************************************************************************************/
 
-#ifndef BinaryHeap_H_
-#define BinaryHeap_H_
+#ifndef BINARYHEAP_H_
+#define BINARYHEAP_H_
 #include <functional>
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ class BinaryHeap {
  private:
     // grows the heap array
     void grow();
-    //pointer to heap array of elements
+    // pointer to heap array of elements
     T* data;
     int capacity;
     int size;
@@ -156,17 +156,17 @@ T BinaryHeap<T, CompareFunc>::top() {
 }
 
 template<class T, class CompareFunc>
-int BinaryHeap<T,CompareFunc>::getSize() {
+int BinaryHeap<T, CompareFunc>::getSize() {
     return size;
 }
 
 template<class T, class CompareFunc>
-bool BinaryHeap<T,CompareFunc>::isFull() {
+bool BinaryHeap<T, CompareFunc>::isFull() {
     return size == capacity;
 }
 
 template<class T, class CompareFunc>
-void BinaryHeap<T,CompareFunc>::shrinkToFit() {
+void BinaryHeap<T, CompareFunc>::shrinkToFit() {
     T* temp_data = new T[size];
     for (int i = 0; i < size; i++) {
         temp_data[i] = data[i];
@@ -177,7 +177,7 @@ void BinaryHeap<T,CompareFunc>::shrinkToFit() {
 }
 
 template<class T, class CompareFunc>
-void BinaryHeap<T,CompareFunc>::grow() {
+void BinaryHeap<T, CompareFunc>::grow() {
     capacity = capacity * 2;
     T* temp_data = new T[capacity];
     for (int i = 0; i < size; i++) {
@@ -187,4 +187,4 @@ void BinaryHeap<T,CompareFunc>::grow() {
     data = temp_data;
 }
 
-#endif // BinaryHeap_H_
+#endif  // BINARYHEAP_H_
