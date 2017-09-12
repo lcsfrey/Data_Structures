@@ -37,6 +37,10 @@ class BinaryHeap {
  public:
     // default constructor
     BinaryHeap();
+    // copy constructor
+    BinaryHeap(const BinaryHeap& other);
+    // destructor
+    ~BinaryHeap();
     // adds value to the heap
     void push(T value);
     // removes and returns element at the top of the heap
@@ -45,8 +49,10 @@ class BinaryHeap {
     T top();
     // returns number of elements in heap
     int getSize();
-    //returns true if the current heap array is full
+    // returns true if the current heap array is full
     inline bool isFull();
+    // resizes and frees up unused capacity allocated for array
+    inline void shrinkToFit();
 
  private:
     // grows the heap array
@@ -68,6 +74,26 @@ BinaryHeap<T, CompareFunc>::BinaryHeap() {
     capacity = 20;
     size = 0;
     data = new T[capacity];
+}
+
+template<class T, class CompareFunc>
+BinaryHeap<T, CompareFunc>::BinaryHeap(const BinaryHeap &other) {
+    capacity = other.capacity;
+    size = other.size;
+    data = new T[capacity];
+
+    T* temp_data = new T[size];
+    for (int i = 0; i < size; i++) {
+        temp_data[i] = other.data[i];
+    }
+    for (int i = 0; i < size; i++) {
+        push(temp_data[other.data]);
+    }
+}
+
+template<class T, class CompareFunc>
+BinaryHeap<T, CompareFunc>::~BinaryHeap() {
+    delete data;
 }
 
 template<class T, class CompareFunc>
@@ -130,8 +156,24 @@ T BinaryHeap<T, CompareFunc>::top() {
 }
 
 template<class T, class CompareFunc>
+int BinaryHeap<T,CompareFunc>::getSize() {
+    return size;
+}
+
+template<class T, class CompareFunc>
 bool BinaryHeap<T,CompareFunc>::isFull() {
     return size == capacity;
+}
+
+template<class T, class CompareFunc>
+void BinaryHeap<T,CompareFunc>::shrinkToFit() {
+    T* temp_data = new T[size];
+    for (int i = 0; i < size; i++) {
+        temp_data[i] = data[i];
+    }
+    delete data;
+    data = temp_data;
+    capacity = size;
 }
 
 template<class T, class CompareFunc>
