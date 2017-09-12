@@ -1,34 +1,77 @@
-#ifndef BINHEAP_H
-#define BINHEAP_H
+/************************************************************************************
+**                                                                                 **
+**  MIT License                                                                    **
+**                                                                                 **
+**  Copyright (c) 2017 Lucas Frey                                                  **
+**                                                                                 **
+**  Permission is hereby granted, free of charge, to any person obtaining          **
+**  a copy of this software and associated documentation files (the "Software"),   **
+**  to deal in the Software without restriction, including without limitation      **
+**  the rights to use, copy, modify, merge, publish, distribute, sublicense,       **
+**  and/or sell copies of the Software, and to permit persons to whom the          **
+**  Software is furnished to do so, subject to the following conditions:           **
+**                                                                                 **
+**  The above copyright notice and this permission notice shall be included        **
+**  in all copies or substantial portions of the Software.                         **
+**                                                                                 **
+**  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS        **
+**  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,    **
+**  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE    **
+**  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER         **
+**  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  **
+**  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE  **
+**  SOFTWARE.                                                                      **
+**                                                                                 **
+************************************************************************************/
+
+#ifndef BinaryHeap_H_
+#define BinaryHeap_H_
 #include <functional>
 
-template <typename T, typename CompareFunc = std::greater<T>>
-class BinHeap {
+////////////////////////////////////////////////////////////////////////////////////////
+// DECLARATIONS
+////////////////////////////////////////////////////////////////////////////////////////
+
+template <class T, class CompareFunc = std::greater<T>>
+class BinaryHeap {
  public:
-    BinHeap();
+    // default constructor
+    BinaryHeap();
+    // adds value to the heap
     void push(T value);
+    // removes and returns element at the top of the heap
     T pop();
-    T getMin();
-    void removeMin();
+    // returns the element at the top of the heap
+    T top();
+    // returns number of elements in heap
     int getSize();
+    //returns true if the current heap array is full
+    inline bool isFull();
 
  private:
-    inline bool isFull();
+    // grows the heap array
     void grow();
+    //pointer to heap array of elements
     T* data;
     int capacity;
     int size;
+    // comparison functor used to define the order of the heap
+    CompareFunc comp;
 };
 
-template<class T, typename CompareFunc>
-BinHeap<T, CompareFunc>::BinHeap() {
+///////////////////////////////////////////////////////////////////////////////
+// DEFINITIONS
+///////////////////////////////////////////////////////////////////////////////
+
+template<class T, class CompareFunc>
+BinaryHeap<T, CompareFunc>::BinaryHeap() {
     capacity = 20;
     size = 0;
     data = new T[capacity];
 }
 
-template<class T, typename CompareFunc>
-void BinHeap<T,CompareFunc>::push(T value) {
+template<class T, class CompareFunc>
+void BinaryHeap<T, CompareFunc>::push(T value) {
     if (isFull()) {
         grow();
     }
@@ -36,7 +79,7 @@ void BinHeap<T,CompareFunc>::push(T value) {
     int parent = size;
     data[size++] = value;
 
-    while (parent != 0 && CompareFunc(data[(parent - 1)/2], data[parent])) {
+    while (parent != 0 && comp(data[(parent - 1)/2], data[parent])) {
         int t_parent = (parent-1)/2;
         T temp_value = data[parent];
         data[parent] = data[t_parent];
@@ -45,13 +88,54 @@ void BinHeap<T,CompareFunc>::push(T value) {
     }
 }
 
-template<class T, typename CompareFunc>
-bool BinHeap<T,CompareFunc>::isFull() {
+template<class T, class CompareFunc>
+T BinaryHeap<T, CompareFunc>::pop() {
+    if (size == 0) {
+        std::cout << "ERROR: Trying to pop from an empty heap!" << std::endl;
+        return T();
+    }
+    T to_return = data[0];
+    size--;
+    data[0] = data[size];
+    int current = 0;
+    while (current < size) {
+        int next = current*2;
+        if (comp(data[current], data[next+1])) {
+                if (comp(data[next+1], data[next+2])) {
+                    int temp = data[current];
+                    data[current] = data[next+2];
+                    data[next+2] = temp;
+                    current = next+2;
+                } else {
+                    int temp = data[current];
+                    data[current] = data[next+1];
+                    data[next+1] = temp;
+                    current = next+1;
+                }
+        } else if (comp(data[current], data[next+2])) {
+            int temp = data[current];
+            data[current] = data[next+2];
+            data[next+2] = temp;
+            current = next+2;
+        } else {
+            break;
+        }
+    }
+    return to_return;
+}
+
+template<class T, class CompareFunc>
+T BinaryHeap<T, CompareFunc>::top() {
+    return data[0];
+}
+
+template<class T, class CompareFunc>
+bool BinaryHeap<T,CompareFunc>::isFull() {
     return size == capacity;
 }
 
-template<class T, typename CompareFunc>
-void BinHeap<T,CompareFunc>::grow() {
+template<class T, class CompareFunc>
+void BinaryHeap<T,CompareFunc>::grow() {
     capacity = capacity * 2;
     T* temp_data = new T[capacity];
     for (int i = 0; i < size; i++) {
@@ -61,4 +145,4 @@ void BinHeap<T,CompareFunc>::grow() {
     data = temp_data;
 }
 
-#endif // BINHEAP_H
+#endif // BinaryHeap_H_
