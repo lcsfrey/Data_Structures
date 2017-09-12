@@ -30,12 +30,14 @@
 #include "stringtrie.h"
 #include "binarytree.h"
 #include "linkedlist.h"
+#include "binaryheap.h"
 
 using namespace std;
 
 void linkedListTest();
 void binaryTreeTest();
 void trieTest();
+void heapTest();
 void storeBookInTrie(StringTrie &book);
 void printLicense();
 
@@ -43,17 +45,18 @@ int main()
 {
    printLicense();
    int choice = -1;
-   while(choice != 0)
+   while (choice != 0)
    {
        cout << "Select data structure:\n";
        cout << "0 - Exit\n";
        cout << "1 - Linked List\n";
        cout << "2 - Binary Tree\n";
        cout << "3 - String Trie\n";
+       cout << "4 - Binary Heap";
        cout << "\n";
        cin >> choice;
        cout << endl;
-       switch(choice){
+       switch (choice){
            case 0:
                break;
            case 1:
@@ -65,6 +68,9 @@ int main()
            case 3:
                trieTest();
                break;
+           case 4:
+               heapTest();
+           break;
            default:
                cout << "Invalid choice!\n";
                break;
@@ -72,13 +78,13 @@ int main()
    }
 }
 
-void linkedListTest(){
+void linkedListTest() {
     LinkedList<int> my_list;
     int choice = -1;
     int list_input = 0;
     int index = 0;
 
-    while(choice != 0)
+    while (choice != 0)
     {
         cout << "----------------Linked List Test----------------" << endl;
         cout << "Select test method:\n";
@@ -93,7 +99,7 @@ void linkedListTest(){
         cout << "8 - Print elements\n";
         cin >> choice;
         cout << endl;
-        switch(choice){
+        switch (choice){
             case 0:
                 break;
             case 1:
@@ -143,11 +149,11 @@ void linkedListTest(){
     }
 }
 
-void trieTest(){
+void trieTest() {
     int choice = -1;
     string temp_word = "";
     StringTrie book;
-    while(choice != 0)
+    while (choice != 0)
     {
         cout << "\n----------------Trie Test----------------" << endl;
         cout << "Select test method:\n";
@@ -161,7 +167,7 @@ void trieTest(){
         cout << "7 - Remove all with prefix\n";
         cin >> choice;
         printf("\r");
-        switch(choice){
+        switch (choice){
             case 0:
                 break;
             case 1:
@@ -207,13 +213,13 @@ void trieTest(){
     }
 }
 
-void binaryTreeTest(){
+void binaryTreeTest() {
 
     BinaryTree<int> myBinaryTree;
     int choice = -1;
     int tree_input = 0;
 
-    while(choice != 0)
+    while (choice != 0)
     {
         cout << "----------------Binary Tree Test----------------" << endl;
         cout << "Select test method:\n";
@@ -226,7 +232,7 @@ void binaryTreeTest(){
         cout << "6 - Print numbers in ascending order\n";
         cin >> choice;
         cout << endl;
-        switch(choice){
+        switch (choice){
             case 0:
                 break;
             case 1:
@@ -265,7 +271,83 @@ void binaryTreeTest(){
     }
 }
 
-void storeBookInTrie(StringTrie &book){
+void heapTest() {
+    BinaryHeap<int, std::less<int>> my_heap;
+    BinaryHeap<int> my_min_heap;
+    srand(time(0));
+    int choice = -1;
+    int heap_input = 0;
+
+    while (choice != 0) {
+        cout << "----------------Min & Max Heap Test----------------" << endl;
+        cout << "Select test method:\n";
+        cout << "0 - Exit\n";
+        cout << "1 - Add number\n";
+        cout << "2 - Remove top\n";
+        cout << "3 - Get size of heap\n";
+        cout << "4 - Get smallest number\n";
+        cout << "5 - Get largest number\n";
+        cout << "6 - Add random values\n";
+        cin >> choice;
+        cout << endl;
+        switch (choice){
+            case 0:
+                break;
+            case 1:
+                cout << "Enter number to add: ";
+                cin >> heap_input;
+                my_heap.push(heap_input);
+                my_min_heap.push(heap_input);
+                break;
+            case 2:
+                cout << "Removing from max heap: " << my_heap.pop() << endl;
+                cout << "Removing from min heap: " << my_min_heap.pop() << endl;
+                break;
+            case 3:
+                cout << "Size of heap: " << my_min_heap.getSize() << endl;
+                break;
+            case 4:
+                cout << "Smallest number is: " << my_min_heap.top() << endl;
+                break;
+            case 5:
+                cout << "Largest number is: " << my_heap.top() << endl;
+                break;
+            case 6: {
+                int count = 0;
+                int max_value = 0;
+                int min_value = 100;
+                cout << "Enter number of values to add: ";
+                cin >> count;
+                cout << "Enter max value: ";
+                cin >> max_value;
+                cout << "Enter min value: ";
+                cin >> min_value;
+                if (min_value > 0) {
+                    max_value += min_value;
+                } else {
+                    max_value -= min_value;
+                }
+
+                for (int i = 0; i < count; i++) {
+                    int value = (rand() % max_value) + min_value;
+                    my_heap.push(value);
+                }
+                break;
+            }
+            default:
+                cout << "Invalid choice!\n";
+                break;
+        }
+    }
+    for (int i = 0; i < 19; i++) {
+        my_heap.push(i);
+    }
+    for (int i = 0; i < 19; i++) {
+        cout << my_heap.pop() << endl;
+    }
+}
+
+void storeBookInTrie(StringTrie &book) {
 
     ifstream myFile;
     myFile.open("GreatExpectations.txt");
@@ -277,7 +359,7 @@ void storeBookInTrie(StringTrie &book){
     char c;
     string temp_word;
     clock_t start = clock();
-    while(!myFile.eof()){
+    while (!myFile.eof()){
         myFile >> temp_word;
         if(temp_word == "----------------------------------------"){
             pageCount++;
