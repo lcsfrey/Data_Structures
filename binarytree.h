@@ -39,36 +39,57 @@ struct TreeNode {
     TreeNode<T>* left;
     TreeNode<T>* right;
     TreeNode<T>* parent;
+    // creates empty tree node
     TreeNode();
+    // creates tree node containing value
     TreeNode<T>(const T& value, TreeNode<T>* temp_parent = nullptr);
 };
 
 template<class T>
 class BinaryTree {
  public:
+    // default constructor
     BinaryTree();
+    // copy constructor
     explicit BinaryTree(const BinaryTree &other_tree);
     void insert(const T& value);
+    // returns true if value is in the tree
     bool contains(const T& value);
+    // returns largest element in tree
     inline T getLargest();
+    // returns smallest element in tree
     inline T getSmallest();
+    // removes value from tree
     void remove(const T& value);
+    // removes largest element from tree
     void removeLargest();
+    // removes smallest element from tree
     void removeSmallest();
+    // prints all elements in tree
     void printAll();
 
  private:
     TreeNode<T>* root;
+    // helper function that does inorder print of current node
+    // and all decendents nodes
     inline void print(TreeNode<T>* current);
+    // helper function that returns largest element in tree
+    // rooted at current
     T getLargest(TreeNode<T>* current);
+    // helper function that returns smallest element in tree
+    // rooted at current
     T getSmallest(TreeNode<T>* current);
+    // helper function that removes largest element in tree
+    // rooted at current
     void removeLargest(TreeNode<T>* current);
+    // helper function that removes smallest element in tree
+    // rooted at current
     void removeSmallest(TreeNode<T> *current);
 };
 
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // DEFINITIONS
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 template<class T>
 TreeNode<T>::TreeNode() {
@@ -86,8 +107,6 @@ TreeNode<T>::TreeNode(const T& value, TreeNode<T>* temp_parent) {
     parent = temp_parent;
 }
 
-// initializes empty Binary Tree
-
 template<class T>
 BinaryTree<T>::BinaryTree() {
     root = nullptr;
@@ -100,7 +119,6 @@ BinaryTree<T>::BinaryTree(const BinaryTree<T> &other_tree) {
 }
 
 // insert node with value into the tree if it does not already exist
-
 template<class T>
 void BinaryTree<T>::insert(const T& value) {
     if (root == nullptr) {
@@ -127,7 +145,6 @@ void BinaryTree<T>::insert(const T& value) {
 
 // Removes value from tree if it exists
 // Replaces value of that node with the largest element on the left of the right
-
 template<class T>
 void BinaryTree<T>::remove(const T &value) {
     if (root == nullptr) {
