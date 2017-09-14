@@ -33,7 +33,7 @@
 #include "binaryheap.h"
 
 using namespace std;
-
+void testMenu();
 void linkedListTest();
 void binaryTreeTest();
 void trieTest();
@@ -41,41 +41,45 @@ void heapTest();
 void storeBookInTrie(StringTrie &book);
 void printLicense();
 
-int main()
-{
-   printLicense();
-   int choice = -1;
-   while (choice != 0)
-   {
-       cout << "Select data structure:\n";
-       cout << "0 - Exit\n";
-       cout << "1 - Linked List\n";
-       cout << "2 - Binary Tree\n";
-       cout << "3 - String Trie\n";
-       cout << "4 - Binary Heap";
-       cout << "\n";
-       cin >> choice;
-       cout << endl;
-       switch (choice){
-           case 0:
-               break;
-           case 1:
-               linkedListTest();
-               break;
-           case 2:
-               binaryTreeTest();
-               break;
-           case 3:
-               trieTest();
-               break;
-           case 4:
-               heapTest();
-           break;
-           default:
-               cout << "Invalid choice!\n";
-               break;
-       }
-   }
+int main() {
+    printLicense();
+    testMenu();
+    return 0;
+}
+
+void testMenu() {
+    int choice = -1;
+    while (choice != 0)
+    {
+        cout << "Select data structure:\n";
+        cout << "0 - Exit\n";
+        cout << "1 - Linked List\n";
+        cout << "2 - Binary Tree\n";
+        cout << "3 - String Trie\n";
+        cout << "4 - Binary Heap";
+        cout << "\n";
+        cin >> choice;
+        cout << endl;
+        switch (choice){
+            case 0:
+                break;
+            case 1:
+                linkedListTest();
+                break;
+            case 2:
+                binaryTreeTest();
+                break;
+            case 3:
+                trieTest();
+                break;
+            case 4:
+                heapTest();
+            break;
+            default:
+                cout << "Invalid choice!\n";
+                break;
+        }
+    }
 }
 
 void linkedListTest() {
@@ -272,7 +276,7 @@ void binaryTreeTest() {
 }
 
 void heapTest() {
-    BinaryHeap<int, std::less<int>> my_heap;
+    BinaryHeap<int, std::less<int>> my_max_heap;
     BinaryHeap<int> my_min_heap;
     srand(time(0));
     int choice = -1;
@@ -296,11 +300,11 @@ void heapTest() {
             case 1:
                 cout << "Enter number to add: ";
                 cin >> heap_input;
-                my_heap.push(heap_input);
+                my_max_heap.push(heap_input);
                 my_min_heap.push(heap_input);
                 break;
             case 2:
-                cout << "Removing from max heap: " << my_heap.pop() << endl;
+                cout << "Removing from max heap: " << my_max_heap.pop() << endl;
                 cout << "Removing from min heap: " << my_min_heap.pop() << endl;
                 break;
             case 3:
@@ -310,7 +314,7 @@ void heapTest() {
                 cout << "Smallest number is: " << my_min_heap.top() << endl;
                 break;
             case 5:
-                cout << "Largest number is: " << my_heap.top() << endl;
+                cout << "Largest number is: " << my_max_heap.top() << endl;
                 break;
             case 6: {
                 int count = 0;
@@ -327,10 +331,10 @@ void heapTest() {
                 } else {
                     max_value -= min_value;
                 }
-
                 for (int i = 0; i < count; i++) {
                     int value = (rand() % max_value) + min_value;
-                    my_heap.push(value);
+                    my_max_heap.push(value);
+                    my_min_heap.push(value);
                 }
                 break;
             }
@@ -338,12 +342,6 @@ void heapTest() {
                 cout << "Invalid choice!\n";
                 break;
         }
-    }
-    for (int i = 0; i < 19; i++) {
-        my_heap.push(i);
-    }
-    for (int i = 0; i < 19; i++) {
-        cout << my_heap.pop() << endl;
     }
 }
 
