@@ -28,9 +28,9 @@
 #define BINARYHEAP_H_
 #include <functional>
 
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // DECLARATIONS
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 template <class T, class CompareFunc = std::greater<T>>
 class BinaryHeap {
@@ -79,15 +79,10 @@ BinaryHeap<T, CompareFunc>::BinaryHeap() {
 template<class T, class CompareFunc>
 BinaryHeap<T, CompareFunc>::BinaryHeap(const BinaryHeap &other) {
     capacity = other.capacity;
-    size = other.size;
+    size = 0;
     data = new T[capacity];
-
-    T* temp_data = new T[size];
     for (int i = 0; i < size; i++) {
-        temp_data[i] = other.data[i];
-    }
-    for (int i = 0; i < size; i++) {
-        push(temp_data[other.data]);
+        push(other.data[i]);
     }
 }
 
@@ -101,7 +96,6 @@ void BinaryHeap<T, CompareFunc>::push(T value) {
     if (isFull()) {
         grow();
     }
-
     int parent = size;
     data[size++] = value;
 
@@ -124,8 +118,8 @@ T BinaryHeap<T, CompareFunc>::pop() {
     size--;
     data[0] = data[size];
     int current = 0;
-    while (current < size) {
-        int next = current*2;
+    int next = 0;
+    while (next < size-2) {
         if (comp(data[current], data[next+1])) {
                 if (comp(data[next+1], data[next+2])) {
                     int temp = data[current];
@@ -146,6 +140,7 @@ T BinaryHeap<T, CompareFunc>::pop() {
         } else {
             break;
         }
+        next = current*2;
     }
     return to_return;
 }
