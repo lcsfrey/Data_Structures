@@ -38,7 +38,7 @@ class BinaryHeap {
     // default constructor
     BinaryHeap();
     // copy constructor
-    BinaryHeap(const BinaryHeap& other);
+    explicit BinaryHeap(const BinaryHeap& other);
     // destructor
     ~BinaryHeap();
     // adds value to the heap
@@ -46,11 +46,11 @@ class BinaryHeap {
     // removes and returns element at the top of the heap
     T pop();
     // returns the element at the top of the heap
-    T top();
+    T top() const;
     // returns number of elements in heap
-    int getSize();
+    int getSize() const;
     // returns true if the current heap array is full
-    inline bool isFull();
+    inline bool isFull() const;
     // resizes and frees up unused capacity allocated for array
     inline void shrinkToFit();
 
@@ -146,17 +146,17 @@ T BinaryHeap<T, CompareFunc>::pop() {
 }
 
 template<class T, class CompareFunc>
-T BinaryHeap<T, CompareFunc>::top() {
+T BinaryHeap<T, CompareFunc>::top() const {
     return data[0];
 }
 
 template<class T, class CompareFunc>
-int BinaryHeap<T, CompareFunc>::getSize() {
+int BinaryHeap<T, CompareFunc>::getSize() const {
     return size;
 }
 
 template<class T, class CompareFunc>
-bool BinaryHeap<T, CompareFunc>::isFull() {
+bool BinaryHeap<T, CompareFunc>::isFull() const {
     return size == capacity;
 }
 
