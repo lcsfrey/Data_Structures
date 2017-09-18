@@ -31,6 +31,7 @@
 #include "binarytree.h"
 #include "linkedlist.h"
 #include "binaryheap.h"
+#include "skiplist.h"
 
 using namespace std;
 void testMenu();
@@ -38,10 +39,12 @@ void linkedListTest();
 void binaryTreeTest();
 void trieTest();
 void heapTest();
+void skipListTest();
 void storeBookInTrie(StringTrie &book);
 void printLicense();
 
 int main() {
+    srand(time(0));
     printLicense();
     testMenu();
     return 0;
@@ -54,9 +57,10 @@ void testMenu() {
         cout << "Select data structure:\n";
         cout << "0 - Exit\n";
         cout << "1 - Linked List\n";
-        cout << "2 - Binary Tree\n";
-        cout << "3 - String Trie\n";
-        cout << "4 - Binary Heap";
+        cout << "2 - Skip List\n";
+        cout << "3 - Binary Tree\n";
+        cout << "4 - String Trie\n";
+        cout << "5 - Binary Heap";
         cout << "\n";
         cin >> choice;
         cout << endl;
@@ -67,12 +71,15 @@ void testMenu() {
                 linkedListTest();
                 break;
             case 2:
-                binaryTreeTest();
+                skipListTest();
                 break;
             case 3:
-                trieTest();
+                binaryTreeTest();
                 break;
             case 4:
+                trieTest();
+                break;
+            case 5:
                 heapTest();
             break;
             default:
@@ -88,8 +95,7 @@ void linkedListTest() {
     int list_input = 0;
     int index = 0;
 
-    while (choice != 0)
-    {
+    while (choice != 0) {
         cout << "----------------Linked List Test----------------" << endl;
         cout << "Select test method:\n";
         cout << "0 - Exit\n";
@@ -99,8 +105,8 @@ void linkedListTest() {
         cout << "4 - Remove number at beginning\n";
         cout << "5 - Remove number at end\n";
         cout << "6 - Remove number at index\n";
-        cout << "7 - Find element\n";
-        cout << "8 - Print elements\n";
+        cout << "7 - Find number\n";
+        cout << "8 - Print numbers\n";
         cin >> choice;
         cout << endl;
         switch (choice){
@@ -250,7 +256,7 @@ void binaryTreeTest() {
                 myBinaryTree.remove(tree_input);
                 break;
             case 3:
-                cout << "Enter element to search for: ";
+                cout << "Enter number to search for: ";
                 cin >> tree_input;
                 if(myBinaryTree.contains(tree_input)){
                     cout << tree_input << " is in the tree\n";
@@ -260,10 +266,10 @@ void binaryTreeTest() {
                 }
                 break;
             case 4:
-                cout << "Smallest element in tree: " << myBinaryTree.getSmallest() << endl;
+                cout << "Smallest number in tree: " << myBinaryTree.getSmallest() << endl;
                 break;
             case 5:
-                cout << "Largest element in tree: " << myBinaryTree.getLargest() << endl;
+                cout << "Largest number in tree: " << myBinaryTree.getLargest() << endl;
                 break;
             case 6:
                 myBinaryTree.printAll();
@@ -317,6 +323,73 @@ void heapTest() {
                 cout << "Largest number is: " << my_max_heap.top() << endl;
                 break;
             case 6: {
+            int count = 0;
+            int max_value = 0;
+            int min_value = 100;
+            cout << "Enter number of values to add: ";
+            cin >> count;
+            cout << "Enter max value: ";
+            cin >> max_value;
+            cout << "Enter min value: ";
+            cin >> min_value;
+            if (min_value > 0) {
+                max_value += min_value;
+            } else {
+                max_value -= min_value;
+            }
+            for (int i = 0; i < count; i++) {
+                int value = (rand() % max_value) + min_value;
+                my_max_heap.push(value);
+                my_min_heap.push(value);
+            }
+            break;
+            }
+            default:
+                cout << "Invalid choice!\n";
+                break;
+        }
+    }
+}
+
+void skipListTest() {
+    SkipList<int> my_skiplist;
+    int choice = -1;
+    int list_input = 0;
+    while (choice != 0)
+    {
+        cout << "----------------Skip List Test----------------" << endl;
+        cout << "Select test method:\n";
+        cout << "0 - Exit\n";
+        cout << "1 - Insert number\n";
+        cout << "2 - Remove number\n";
+        cout << "3 - Find number\n";
+        cout << "4 - Add random numbers\n";
+        cout << "5 - Print numbers\n";
+        cin >> choice;
+        cout << endl;
+        switch (choice){
+            case 0:
+                break;
+            case 1:
+                cout << "Enter a number to add: ";
+                cin >> list_input;
+                my_skiplist.insert(list_input);
+                break;
+            case 2:
+                cout << "Enter a number to remove: ";
+                cin >> list_input;
+                //my_skiplist.remove(list_input);
+                break;
+            case 3:
+                cout << "Enter a number to find: ";
+                cin >> list_input;
+                if(my_skiplist.contains(list_input)) {
+                    cout << list_input << " is in the list\n";
+                } else {
+                    cout << list_input << " is not in the list\n";
+                }
+                break;
+            case 4: {
                 int count = 0;
                 int max_value = 0;
                 int min_value = 100;
@@ -333,11 +406,13 @@ void heapTest() {
                 }
                 for (int i = 0; i < count; i++) {
                     int value = (rand() % max_value) + min_value;
-                    my_max_heap.push(value);
-                    my_min_heap.push(value);
+                    my_skiplist.insert(value);
                 }
                 break;
             }
+            case 5:
+                my_skiplist.print();
+                break;
             default:
                 cout << "Invalid choice!\n";
                 break;
