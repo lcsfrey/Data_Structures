@@ -27,6 +27,7 @@
 #define SKIPLIST_H_
 #include <vector>
 #include <random>
+#include <functional>
 
 ///////////////////////////////////////////////////////////////////////////////
 // DECLARATIONS
@@ -41,7 +42,7 @@ struct SkipListNode {
     explicit SkipListNode(const T& value);
 };
 
-template<class T>
+template<class T, class CompareFunc = std::less<T>>
 class SkipList {
  public:
      SkipList();
@@ -60,11 +61,13 @@ class SkipList {
      void print() const;
 
  private:
+     SkipListNode<T> *findNode(const T& value) const;
      SkipListNode<T>* head;
      SkipListNode<T>* tail;
      std::default_random_engine m_generator;
      std::bernoulli_distribution m_distribution;
      int length;
+     CompareFunc comp;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,8 +87,8 @@ SkipListNode<T>::SkipListNode(const T &value) {
     prev.push_back(nullptr);
 }
 
-template<class T>
-SkipList<T>::SkipList() : m_distribution(.5) {
+template<class T, class CompareFunc>
+SkipList<T, CompareFunc>::SkipList() : m_distribution(.5) {
     length = 0;
     tail = new SkipListNode<T>();
     head = new SkipListNode<T>();
@@ -93,8 +96,8 @@ SkipList<T>::SkipList() : m_distribution(.5) {
     tail->prev[0] = head;
 }
 
-template<class T>
-SkipList<T>::~SkipList() {
+template<class T, class CompareFunc>
+SkipList<T, CompareFunc>::~SkipList() {
     SkipListNode<T>* current = head;
     SkipListNode<T>* next;
     while (current != tail) {
@@ -105,14 +108,14 @@ SkipList<T>::~SkipList() {
     delete current;
 }
 
-template<class T>
-void SkipList<T>::insert(const T &value) {
+template<class T, class CompareFunc>
+void SkipList<T, CompareFunc>::insert(const T &value) {
     int current_level = head->next.size() - 1;
     std::vector<SkipListNode<T>*> jump_list(head->next.size());
     SkipListNode<T>* current = head;
     SkipListNode<T>* next = current->next.back();
     while (current_level > 0) {
-        if(next != tail && next->data < value) {
+        if (next != tail && comp(current->next[current_level]->data, value)) {
             current = next;
             next = next->next.at(current_level);
         } else {
@@ -121,7 +124,7 @@ void SkipList<T>::insert(const T &value) {
             next = current->next.at(current_level);
         }
     }
-    while (next != tail && next->data < value) {
+    while (next != tail && comp(current->next[current_level]->data, value)) {
         current = next;
         next = next->next[0];
     }
@@ -154,58 +157,41 @@ void SkipList<T>::insert(const T &value) {
     length++;
 }
 
-template<class T>
-void SkipList<T>::remove(const T &value) {
-    int current_level = head->next.size() - 1;
-    SkipListNode<T>* current = head->next[0];
-    while (current != tail && current_level >= 0) {
-        if (current->data == value) {
-            SkipListNode<T>* node_to_delete = current;
-            for (int i = node_to_delete->next.size() - 1; i >= 0; i--) {
-                node_to_delete->prev[i]->next[i] = node_to_delete->next[i];
-                node_to_delete->next[i]->prev[i] = node_to_delete->prev[i];
-            }
-            delete node_to_delete;
-            length--;
-            return;
-        } else if (current->next[current_level] != tail &&
-                   current->next[current_level]->data <= value) {
-            current = current->next[current_level];
-        } else {
-            current_level--;
+template<class T, class CompareFunc>
+void SkipList<T, CompareFunc>::remove(const T &value) {
+    SkipListNode<T>* node_to_delete = findNode(value);
+    if (node_to_delete != nullptr) {
+        for (int i = node_to_delete->next.size() - 1; i >= 0; i--) {
+            node_to_delete->prev[i]->next[i] = node_to_delete->next[i];
+            node_to_delete->next[i]->prev[i] = node_to_delete->prev[i];
         }
+        delete node_to_delete;
+        length--;
     }
 }
 
-template<class T>
-bool SkipList<T>::contains(const T &value) const {
-    int current_level = head->next.size() - 1;
-    SkipListNode<T>* current = head;
-    do {
-        if (current->data == value) {
-            return true;
-        } else if (current->next[current_level] != tail &&
-                   current->next[current_level]->data <= value) {
-            current = current->next[current_level];
-        } else {
-            current_level--;
-        }
-    } while (current != tail && current_level >= 0);
-    return false;
+template<class T, class CompareFunc>
+bool SkipList<T, CompareFunc>::contains(const T &value) const {
+    SkipListNode<T>* current = findNode(value);
+    if (current != nullptr) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
-template<class T>
-int SkipList<T>::getLength() const {
+template<class T, class CompareFunc>
+int SkipList<T, CompareFunc>::getLength() const {
     return length;
 }
 
-template<class T>
-bool SkipList<T>::isEmpty() const {
+template<class T, class CompareFunc>
+bool SkipList<T, CompareFunc>::isEmpty() const {
     return length == 0;
 }
 
-template<class T>
-void SkipList<T>::print() const {
+template<class T, class CompareFunc>
+void SkipList<T, CompareFunc>::print() const {
     SkipListNode<T>* current = head->next[0];
     std::cout << "Head -> ";
     while (current != tail->prev[0]) {
@@ -213,6 +199,24 @@ void SkipList<T>::print() const {
         current = current->next[0];
     }
     std::cout << current->data << " -> Tail" << std::endl;
+}
+
+template<class T, class CompareFunc>
+SkipListNode<T>* SkipList<T, CompareFunc>::findNode(const T &value) const {
+    int current_level = head->next.size() - 1;
+    SkipListNode<T>* current = head;
+    do {
+        if (current->data == value) {
+            return current;
+        } else if (current->next[current_level] != tail &&
+                   (comp(current->next[current_level]->data, value) ||
+                    current->next[current_level]->data == value)) {
+            current = current->next[current_level];
+        } else {
+            current_level--;
+        }
+    } while (current != tail && current_level >= 0);
+    return nullptr;
 }
 
 #endif  // SKIPLIST_H_
