@@ -38,36 +38,64 @@ struct SkipListNode {
     T data;
     std::vector<SkipListNode<T>*> next;
     std::vector<SkipListNode<T>*> prev;
+    // creates empty list node
     SkipListNode();
+    // creates list node containing value
     explicit SkipListNode(const T& value);
 };
 
 template<class T, class CompareFunc = std::less<T>>
 class SkipList {
  public:
-     SkipList();
-     explicit SkipList(const SkipList& other_list);
-     ~SkipList();
+    // default constructor
+    SkipList();
+    // copy constructor
+    explicit SkipList(const SkipList& other_list);
+    // destructor
+    ~SkipList();
+    // assignment operator
+    SkipList& operator=(const SkipList& other_list);
 
-     SkipList& operator=(const SkipList& other_list);
+    // insert value into list
+    void insert(const T& value);
 
-     void insert(const T& value);
-     void remove(const T& value);
-     bool contains(const T& value) const;
-     T front();
-     T back();
-     inline int getLength() const;
-     inline bool isEmpty() const;
-     void print() const;
+    // remove value from list
+    void remove(const T& value);
+
+    // returns true if value is in the list
+    bool contains(const T& value) const;
+
+    // returns first element in the list
+    T getFirst() const;
+    // returns last element in the list
+    T getLast() const;
+
+    // returns number of elements in the list
+    inline int getLength() const;
+
+    // returns true if list is empty
+    inline bool isEmpty() const;
+
+    // prints list in order in the form,
+    // "Head -> data -> data -> data.... -> Tail"
+    void print() const;
 
  private:
-     SkipListNode<T> *findNode(const T& value) const;
-     SkipListNode<T>* head;
-     SkipListNode<T>* tail;
-     std::default_random_engine m_generator;
-     std::bernoulli_distribution m_distribution;
-     int length;
-     CompareFunc comp;
+    // finds value in list and returns pointer to that node
+    // returns null pointer if value is not in list
+    SkipListNode<T>* findNode(const T& value) const;
+
+    // used by insert method to determine if new skip list layer
+    // should be created
+    std::default_random_engine m_generator;
+    std::bernoulli_distribution m_distribution;
+
+    // comparison functor used to define the order of the skip list
+    CompareFunc comp;
+
+    SkipListNode<T>* head;
+    SkipListNode<T>* tail;
+    int length;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
