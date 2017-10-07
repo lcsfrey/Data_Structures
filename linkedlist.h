@@ -29,41 +29,62 @@
 
 #include<iostream>
 
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // DECLARATIONS
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 template<class T>
 struct ListNode {
     T data;
     ListNode<T>* next;
     ListNode<T>* prev;
+    // creates empty list node
     ListNode();
+    // creates list node containing value
     explicit ListNode(const T& value);
 };
 
 template<class T>
 class LinkedList {
  public:
+    // default constructor
     LinkedList();
+    // copy constructor
     explicit LinkedList(const LinkedList& other_list);
+    // destructor
     ~LinkedList();
-
+    // assignment operator
     LinkedList& operator=(const LinkedList& other_list);
 
+    // insert value at start of list
     void insertStart(const T& value);
+    // insert value at end of list
     void insertEnd(const T& value);
+    // insert value at specified index
     void insertAt(const T& value, const int index);
 
+    // returns true if value is in list
+    bool contains(const T& value) const;
+
+    // returns first element in the list
+    inline T getFirst() const;
+    // returns last element in the list
+    inline T getLast() const;
+    // returns element at specified index
+    T getItemAt(const int index) const;
+
+    // removes first element from the list
     T removeFirst();
+    // removes last element from the list
     T removeLast();
+    // removes element at specified index
     T removeAt(const int index);
 
-    bool contains(const T& value);
-    inline T getFirst();
-    inline T getLast();
-    T getItemAt(const int index);
+    //returns number of elements in list
     inline int getLength() const;
+
+    // prints list in order in the form,
+    // "Head -> data -> data -> data...."
     void print() const;
 
  private:
@@ -72,9 +93,9 @@ class LinkedList {
         int length;
 };
 
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // DEFINITIONS
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // initializes empty ListNode
 template<class T>
 ListNode<T>::ListNode() {
@@ -130,24 +151,6 @@ LinkedList<T>::~LinkedList() {
     }
     delete current->prev;
     delete current;
-}
-
-template<class T>
-int LinkedList<T>::getLength() const {
-    return length;
-}
-
-// prints list in order in the form,
-// "Head -> data -> data -> data...."
-template<class T>
-void LinkedList<T>::print() const {
-    ListNode<T>* current = head->next;
-    std::cout << "Head -> ";
-    while (current != tail->prev) {
-        std::cout << current->data << " -> ";
-        current = current->next;
-    }
-    std::cout << current->data << std::endl;
 }
 
 // insert item at start of list
@@ -252,7 +255,7 @@ T LinkedList<T>::removeAt(const int index) {
 }
 
 template<class T>
-bool LinkedList<T>::contains(const T &value) {
+bool LinkedList<T>::contains(const T &value) const {
     ListNode<T>* current = head->next;
     while (current != tail) {
         if (current->data == value) {
@@ -264,17 +267,17 @@ bool LinkedList<T>::contains(const T &value) {
 }
 
 template<class T>
-T LinkedList<T>::getFirst() {
+T LinkedList<T>::getFirst() const {
     return head->next->data;
 }
 
 template<class T>
-T LinkedList<T>::getLast() {
+T LinkedList<T>::getLast() const {
     return tail->prev->data;
 }
 
 template<class T>
-T LinkedList<T>::getItemAt(const int index) {
+T LinkedList<T>::getItemAt(const int index) const {
     if (index >= length) {
         return tail->prev->data;
     } else if (index == 0) {
@@ -288,6 +291,24 @@ T LinkedList<T>::getItemAt(const int index) {
         }
         return current->data;
     }
+}
+
+template<class T>
+int LinkedList<T>::getLength() const {
+    return length;
+}
+
+// prints list in order in the form,
+// "Head -> data -> data -> data...."
+template<class T>
+void LinkedList<T>::print() const {
+    ListNode<T>* current = head->next;
+    std::cout << "Head -> ";
+    while (current != tail->prev) {
+        std::cout << current->data << " -> ";
+        current = current->next;
+    }
+    std::cout << current->data << std::endl;
 }
 
 #endif  // LINKEDLIST_H_
