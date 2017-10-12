@@ -34,37 +34,67 @@
 #include <utility>
 
 struct StringTrieNode {
-    explicit StringTrieNode(char input_char) : data(input_char) {}
-    ~StringTrieNode();
-    bool is_a_word = false;
-    char data;
-    StringTrieNode* parent = nullptr;
+    bool is_a_word;
+    const char data;
+    StringTrieNode* parent;
+    // hash table containing points to all suffixes
     std::map<char, StringTrieNode*> m_paths;
+    // creates node containing input_char
+    explicit StringTrieNode(char input_char);
+    // deletes node and all children nodes in subtrie
+    ~StringTrieNode();
 };
 
 class StringTrie {
  public:
+    // constructs empty trie
     StringTrie();
+    // creates deep copy of trie
     explicit StringTrie(const StringTrie &other_trie);
+    // destructor
+    // calls removeSubTrie(head)
     ~StringTrie();
 
+    // adds word to trie
     void addWord(const std::string &word);
 
+    // removes word from trie, deleting any node that isn't the prefix
+    // of another another word
     void remove(const std::string &word);
-    void removeAllWithPrefix(const std::string &word);
 
+    // removes all words with a given prefix
+    // input:
+    //    string word - prefix to search for
+    void removeAllWithPrefix(const std::string &prefix);
+
+    // returns true if word is in the trie
     bool contains(const std::string &word);
 
+    // returns total number of words within trie
     int getNumberTotalWords() const;
+    // returns number of unique words within the trie
     int getNumberUniqueWords() const;
+
+    std::string getLongestWord() const;
     int getLengthOfShortestWord() const;
     int getLengthOfLongestWord() const;
 
     void printAll();
-    void printAllWithPrefix(const std::string &word);
+    void printAllWithPrefix(const std::string &prefix);
 
  private:
+    // prints all words in subtree,
+    // word is built up one character at a time with each rescursive call
     void printAllHelper(StringTrieNode* current, std::string word);
+
+    // recursive function that finds the longest suffix from the current node
+    void findLongestWord(StringTrieNode* current_node, int current_length, int &longest_length, StringTrieNode *&longest) const;
+
+    // constructs word character by character starting from the last character in the word
+    void buildStringFromFinalNode(StringTrieNode* current_node, std::string &word) const ;
+
+    // helper function that deletes all nodes in subtrie
+    void removeSubTrie(StringTrieNode* current);
 
     StringTrieNode* head;
     int number_of_total_words = 0;
