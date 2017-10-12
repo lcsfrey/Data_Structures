@@ -32,21 +32,19 @@
 #include <utility>
 #include <string>
 
+StringTrieNode::StringTrieNode(char input_char)
+  : data(input_char),
+    parent(nullptr),
+    is_a_word(false) {}
+
 StringTrieNode::~StringTrieNode() {
-    if (this->m_paths.size() == 0) {
-        return;
+}
+
+void StringTrie::removeSubTrie(StringTrieNode* current) {
+    for (std::pair<char, StringTrieNode*> iter : current->m_paths) {
+        removeSubTrie(iter.second);
     }
-    std::queue<StringTrieNode*> all_paths;
-    StringTrieNode* current = this;
-    all_paths.push(this);
-    while (all_paths.size() > 0) {
-        current = all_paths.front();
-        all_paths.pop();
-        for (auto iter : current->m_paths) {
-            all_paths.push(iter.second);
-        }
-        delete current;
-    }
+    delete current;
 }
 
 StringTrie::StringTrie() {
@@ -54,7 +52,7 @@ StringTrie::StringTrie() {
 }
 
 StringTrie::~StringTrie() {
-    delete head;
+    removeSubTrie(head);
 }
 
 void StringTrie::addWord(const std::string &word) {
@@ -76,7 +74,6 @@ void StringTrie::addWord(const std::string &word) {
     }
 
     if (!current_node->is_a_word) number_of_unique_words +=1;
-
     current_node->is_a_word = true;
     number_of_total_words += 1;
 }
@@ -102,6 +99,7 @@ bool StringTrie::contains(const std::string &word) {
     }
 }
 
+//
 void StringTrie::remove(const std::string &word) {
     std::map<char, StringTrieNode*>* current_map = &head->m_paths;
     std::map<char, StringTrieNode*>* parent_map = &head->m_paths;
@@ -122,7 +120,7 @@ void StringTrie::remove(const std::string &word) {
     }
     potential_deletions.push_back(current_node);
 
-    while (potential_deletions.size() > 1) {
+    while (potential_deletions.size() >= 1) {
         current_node = potential_deletions.back();
         potential_deletions.pop_back();
         parent_map = &potential_deletions.back()->m_paths;
@@ -137,22 +135,22 @@ void StringTrie::remove(const std::string &word) {
     }
 }
 
-void StringTrie::removeAllWithPrefix(const std::string &word) {
+void StringTrie::removeAllWithPrefix(const std::string &prefix) {
     std::map<char, StringTrieNode*>* current_map = &head->m_paths;
     StringTrieNode* current_node = head;
-    const char* c_string_word = word.c_str();
+    const char* c_string_prefix = prefix.c_str();
     char key_char = -1;
-    int size = word.length();
+    int size = prefix.length();
     for (int i = 0; i < size; i++) {
-        key_char = tolower(c_string_word[i]);
+        key_char = tolower(c_string_prefix[i]);
         if (current_map->find(key_char) == current_map->end()) {
-            std::cout << "\nNo words with prefix: " << word << std::endl;
+            std::cout << "\nNo words with prefix: " << prefix << std::endl;
             return;
         }
         current_node = current_map->at(key_char);
         current_map = &current_node->m_paths;
     }
-    current_node->m_paths.clear();
+    removeSubTrie(current_node);
 }
 
 void StringTrie::printAll() {
@@ -161,22 +159,22 @@ void StringTrie::printAll() {
 
 // prints all words with a given prefix
 // input: prefix of words to print
-void StringTrie::printAllWithPrefix(const std::string &word) {
+void StringTrie::printAllWithPrefix(const std::string &prefix) {
     std::map<char, StringTrieNode*>* current_map = &head->m_paths;
     StringTrieNode* current_node = head;
-    const char* c_string_word = word.c_str();
+    const char* c_string_prefix = prefix.c_str();
     char key_char = -1;
-    int size = word.length();
+    int size = prefix.length();
     for (int i = 0; i < size; i++) {
-        key_char = tolower(c_string_word[i]);
+        key_char = tolower(c_string_prefix[i]);
         if (current_map->find(key_char) == current_map->end()) {
-            std::cout << "\nNo words with prefix: " << word << std::endl;
+            std::cout << "\nNo words with prefix: " << prefix << std::endl;
             return;
         }
         current_node = current_map->at(key_char);
         current_map = &current_node->m_paths;
     }
-    printAllHelper(current_node, word);
+    printAllHelper(current_node, prefix);
 }
 
 // prints all words in subtree,
@@ -185,8 +183,8 @@ void StringTrie::printAllHelper(StringTrieNode* current, std::string word) {
     if (current->is_a_word) {
         std::cout << word + current->data << std::endl;
     }
-    for (auto iter : current->m_paths) {
-        printAllHelper(iter.second, word + iter.first);
+    for (auto t_pair : current->m_paths) {
+        printAllHelper(t_pair.second, word + t_pair.first);
     }
 }
 
@@ -196,6 +194,15 @@ int StringTrie::getNumberTotalWords() const {
 
 int StringTrie::getNumberUniqueWords() const {
     return number_of_unique_words;
+}
+
+std::string StringTrie::getLongestWord() const {
+    int length = 0;
+    std::string word = "";
+    StringTrieNode* final_node = head;
+    findLongestWord(head, 0, length, final_node);
+    buildStringFromFinalNode(final_node, word);
+    return word;
 }
 
 // returns the length of the shortest word in trie
@@ -225,3 +232,36 @@ int StringTrie::getLengthOfShortestWord() const {
     }
     return 0;
 }
+
+// constructs string character by character
+void StringTrie::buildStringFromFinalNode(StringTrieNode* current_node,
+                                          std::string &word) const {
+    if (current_node->data != '\0') {
+        buildStringFromFinalNode(current_node->parent, word);
+        word += current_node->data;
+    }
+}
+
+// returns longest word in trie
+//
+void StringTrie::findLongestWord(StringTrieNode* current_node, int current_length,
+                                 int &longest_length, StringTrieNode *&longest) const {
+    for (auto next_node : current_node->m_paths) {
+        findLongestWord(next_node.second, current_length+1, longest_length, longest);
+    }
+    if (current_node->is_a_word && current_length > longest_length) {
+        longest_length = current_length;
+        longest = current_node;
+    }
+}
+
+int StringTrie::getLengthOfLongestWord() const {
+    int max_length = 0;
+    StringTrieNode* final_node = head;
+    std::string word = "";
+    findLongestWord(head, 0, max_length, final_node);
+    buildStringFromFinalNode(final_node, word);
+    std::cout << word << std::endl;
+    return max_length;
+}
+
