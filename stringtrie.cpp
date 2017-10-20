@@ -181,7 +181,7 @@ void StringTrie::printAllWithPrefix(const std::string &prefix) {
 // word is built up one character at a time with each rescursive call
 void StringTrie::printAllHelper(StringTrieNode* current, std::string word) {
     if (current->is_a_word) {
-        std::cout << word + current->data << std::endl;
+        std::cout << word << std::endl;
     }
     for (auto t_pair : current->m_paths) {
         printAllHelper(t_pair.second, word + t_pair.first);

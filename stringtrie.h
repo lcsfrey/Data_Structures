@@ -76,6 +76,7 @@ class StringTrie {
     int getNumberUniqueWords() const;
 
     std::string getLongestWord() const;
+
     int getLengthOfShortestWord() const;
     int getLengthOfLongestWord() const;
 
@@ -88,7 +89,8 @@ class StringTrie {
     void printAllHelper(StringTrieNode* current, std::string word);
 
     // recursive function that finds the longest suffix from the current node
-    void findLongestWord(StringTrieNode* current_node, int current_length, int &longest_length, StringTrieNode *&longest) const;
+    void findLongestWord(StringTrieNode* current_node, int current_length,
+                         int &longest_length, StringTrieNode *&longest) const;
 
     // constructs word character by character starting from the last character in the word
     void buildStringFromFinalNode(StringTrieNode* current_node, std::string &word) const ;
