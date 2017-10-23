@@ -33,6 +33,8 @@
 #include <map>
 #include <utility>
 
+class StringRecord;
+
 struct StringTrieNode {
     bool is_a_word;
     const char data;
@@ -64,7 +66,7 @@ class StringTrie {
 
     // removes all words with a given prefix
     // input:
-    //    string word - prefix to search for
+    //    string prefix - prefix to search for
     void removeAllWithPrefix(const std::string &prefix);
 
     // returns true if word is in the trie
@@ -83,6 +85,15 @@ class StringTrie {
     void printAll();
     void printAllWithPrefix(const std::string &prefix);
 
+    friend class StringRecord;
+    StringRecord* m_record;
+
+ protected:
+    // constructs word character by character starting from the
+    // last character in the word
+    void buildStringFromFinalNode(StringTrieNode* current_node,
+                                  std::string &word) const ;
+
  private:
     // prints all words in subtree,
     // word is built up one character at a time with each rescursive call
@@ -92,9 +103,6 @@ class StringTrie {
     void findLongestWord(StringTrieNode* current_node, int current_length,
                          int &longest_length, StringTrieNode *&longest) const;
 
-    // constructs word character by character starting from the last character in the word
-    void buildStringFromFinalNode(StringTrieNode* current_node, std::string &word) const ;
-
     // helper function that deletes all nodes in subtrie
     void removeSubTrie(StringTrieNode* current);
 
@@ -103,5 +111,15 @@ class StringTrie {
     int number_of_unique_words = 0;
 };
 
+class StringRecord {
+ public:
+    StringRecord() {}
+    inline const std::map<StringTrieNode*, int>* getRecord() { return &m_record; }
+    void addWord(StringTrieNode* current_node);
+    std::vector<std::pair<std::string, int>> getOrderedWords(const StringTrie *trie);
+    // std::vector<int> getOrderedOccurances;
+ private:
+    std::map<StringTrieNode*, int> m_record;
+};
 
 #endif  // STRINGTRIE_H_

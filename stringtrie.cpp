@@ -31,6 +31,7 @@
 #include <map>
 #include <utility>
 #include <string>
+#include <algorithm>
 
 StringTrieNode::StringTrieNode(char input_char)
   : data(input_char),
@@ -41,7 +42,7 @@ StringTrieNode::~StringTrieNode() {
 }
 
 void StringTrie::removeSubTrie(StringTrieNode* current) {
-    for (std::pair<char, StringTrieNode*> iter : current->m_paths) {
+    for (const std::pair<char, StringTrieNode*>& iter : current->m_paths) {
         removeSubTrie(iter.second);
     }
     delete current;
@@ -49,6 +50,7 @@ void StringTrie::removeSubTrie(StringTrieNode* current) {
 
 StringTrie::StringTrie() {
     head = new StringTrieNode('\0');
+    m_record = new StringRecord();
 }
 
 StringTrie::~StringTrie() {
@@ -76,6 +78,8 @@ void StringTrie::addWord(const std::string &word) {
     if (!current_node->is_a_word) number_of_unique_words +=1;
     current_node->is_a_word = true;
     number_of_total_words += 1;
+
+    m_record->addWord(current_node);
 }
 
 bool StringTrie::contains(const std::string &word) {
@@ -183,7 +187,7 @@ void StringTrie::printAllHelper(StringTrieNode* current, std::string word) {
     if (current->is_a_word) {
         std::cout << word << std::endl;
     }
-    for (auto t_pair : current->m_paths) {
+    for (const auto& t_pair : current->m_paths) {
         printAllHelper(t_pair.second, word + t_pair.first);
     }
 }
@@ -246,7 +250,7 @@ void StringTrie::buildStringFromFinalNode(StringTrieNode* current_node,
 //
 void StringTrie::findLongestWord(StringTrieNode* current_node, int current_length,
                                  int &longest_length, StringTrieNode *&longest) const {
-    for (auto next_node : current_node->m_paths) {
+    for (const auto& next_node : current_node->m_paths) {
         findLongestWord(next_node.second, current_length+1, longest_length, longest);
     }
     if (current_node->is_a_word && current_length > longest_length) {
@@ -263,5 +267,34 @@ int StringTrie::getLengthOfLongestWord() const {
     buildStringFromFinalNode(final_node, word);
     std::cout << word << std::endl;
     return max_length;
+}
+
+
+void StringRecord::addWord(StringTrieNode *current_node) {
+    auto it = m_record.find(current_node);
+    if (it == m_record.end()) {
+        m_record[current_node] == 1;
+    } else {
+        it->second += 1;
+    }
+}
+
+std::vector<std::pair<std::string, int>> StringRecord::getOrderedWords(const StringTrie *trie) {
+  std::vector<std::pair<std::string, int>> words;
+  int word_occurences = 0;
+  std::string word = "";
+  for (const auto &pair : m_record) {
+      if (pair.second < 40) continue;
+      trie->buildStringFromFinalNode(pair.first, word);
+      word_occurences = pair.second;
+      words.push_back(std::pair<std::string, int>(std::move(word), word_occurences));
+  }
+
+  std::sort(words.begin(), words.end(),
+            [](const std::pair<std::string, int> &left,
+               const std::pair<std::string, int> &right) {
+      return left.second > right.second;
+  });
+  return words;
 }
 
