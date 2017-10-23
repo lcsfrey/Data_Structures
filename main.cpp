@@ -32,6 +32,7 @@
 #include "linkedlist.h"
 #include "binaryheap.h"
 #include "skiplist.h"
+#include "wordtrie.h"
 
 using namespace std;
 void testMenu();
@@ -90,7 +91,7 @@ void testMenu() {
 }
 
 void linkedListTest() {
-    LinkedList<int> my_list;
+    LinkedList<int> my_linked_list;
     int choice = -1;
     int list_input = 0;
     int index = 0;
@@ -115,42 +116,42 @@ void linkedListTest() {
             case 1:
                 cout << "Enter a number to add: ";
                 cin >> list_input;
-                my_list.insertStart(list_input);
+                my_linked_list.insertStart(list_input);
                 break;
             case 2:
                 cout << "Enter a number to add: ";
                 cin >> list_input;
-                my_list.insertEnd(list_input);
+                my_linked_list.insertEnd(list_input);
                 break;
             case 3:
                 cout << "Enter a number to add: ";
                 cin >> list_input;
                 cout << "Enter an index: ";
                 cin >> index;
-                my_list.insertAt(list_input, index);
+                my_linked_list.insertAt(list_input, index);
                 break;
             case 4:
-                cout << "Removing " << my_list.removeFirst() << " from the start\n";
+                cout << "Removing " << my_linked_list.removeFirst() << " from the start\n";
                 break;
             case 5:
-                cout << "Removing " << my_list.removeLast() << " from the end\n";
+                cout << "Removing " << my_linked_list.removeLast() << " from the end\n";
                 break;
             case 6:
                 cout << "Enter an index: ";
                 cin >> index;
-                my_list.removeAt(index);
+                my_linked_list.removeAt(index);
                 break;
             case 7:
                 cout << "Enter a number to find: ";
                 cin >> list_input;
-                if(my_list.contains(list_input)) {
+                if(my_linked_list.contains(list_input)) {
                     cout << list_input << " is in the list\n";
                 } else {
                     cout << list_input << " is not in the list\n";
                 }
                 break;
             case 8:
-                my_list.print();
+                my_linked_list.print();
                 break;
             default:
                 cout << "Invalid choice!\n";
@@ -162,7 +163,7 @@ void linkedListTest() {
 void trieTest() {
     int choice = -1;
     string temp_word = "";
-    StringTrie book;
+    StringTrie my_string_trie;
     while (choice != 0)
     {
         cout << "\n----------------Trie Test----------------" << endl;
@@ -172,60 +173,89 @@ void trieTest() {
         cout << "2 - Add word\n";
         cout << "3 - Print all\n";
         cout << "4 - Print all with prefix\n";
-        cout << "5 - Search for word in trie\n";
-        cout << "6 - Remove word\n";
-        cout << "7 - Remove all with prefix\n";
+        cout << "5 - Print all ordered by occurance\n";
+        cout << "6 - Search for word in trie\n";
+        cout << "7 - Remove word\n";
+        cout << "8 - Remove all with prefix\n";
+        cout << "9 - Get longest word\n";
+        cout << "10 - Get length of shortest word\n";
+        cout << "11 - Get length of longest word\n\n";
         cin >> choice;
-        printf("\r");
         switch (choice){
             case 0:
                 break;
             case 1:
-                storeBookInTrie(book);
+                storeBookInTrie(my_string_trie);
+
             break;
             case 2:
                 cout << "Enter word to add: ";
                 cin >> temp_word;
-                book.addWord(temp_word);
+                my_string_trie.addWord(temp_word);
             break;
             case 3:
-                book.printAll();
+                my_string_trie.printAll();
                 break;
             case 4:
                 cout << "Enter prefix: ";
                 cin >> temp_word;
-                book.printAllWithPrefix(temp_word);
+                my_string_trie.printAllWithPrefix(temp_word);
                 break;
-            case 5:
+            case 5: {
+
+                std::vector<pair<string, int>> words_by_frequency = my_string_trie.m_record->getOrderedWords(&my_string_trie);
+                int size = words_by_frequency.size();
+                string word = "";
+                cout << "\nWords By Occurences\n----------------------------\n";
+                for (int i = 0; i < size / 2; i++) {
+                    pair<string, int> pair_word_freq = words_by_frequency[i];
+                    cout << "word " << i << ": " << pair_word_freq.first
+                         << "\nfrequency: " << pair_word_freq.second << endl << endl;
+                }
+                break;
+            }
+            case 6:
                 cout << "Enter word to search for: ";
                 cin >> temp_word;
-                if(book.contains(temp_word)){
+                if(my_string_trie.contains(temp_word)){
                     std::cout << temp_word << " is in the trie\n";
                 }
                 else{
                     std::cout << temp_word << " is not in the trie\n";
                 }
                 break;
-            case 6:
+            case 7:
                 cout << "Enter word to remove: ";
                 cin >> temp_word;
-                book.remove(temp_word);
+                my_string_trie.remove(temp_word);
                 break;
-            case 7:
+            case 8:
                 cout << "Enter prefix: ";
                 cin >> temp_word;
-                book.removeAllWithPrefix(temp_word);
+                my_string_trie.removeAllWithPrefix(temp_word);
                 break;
+            case 9:
+                cout << "Longest word: " << my_string_trie.getLongestWord() << endl;
+                break;
+            case 10:
+                cout << "Length of shortest word: " << my_string_trie.getLengthOfShortestWord() << endl;
+                break;
+            case 11:
+                cout << "Length of longest word: " << my_string_trie.getLengthOfLongestWord() << endl;
+                break;
+
             default:
                 cout << "Invalid choice!\n";
                 break;
         }
+
+      }
+
     }
-}
+
 
 void binaryTreeTest() {
-
-    BinaryTree<int> myBinaryTree;
+    BinaryTree<int> my_binary_tree;
     int choice = -1;
     int tree_input = 0;
 
@@ -248,17 +278,17 @@ void binaryTreeTest() {
             case 1:
                 cout << "Enter number to add: ";
                 cin >> tree_input;
-                myBinaryTree.insert(tree_input);
+                my_binary_tree.insert(tree_input);
                 break;
             case 2:
                 cout << "Enter number to remove: ";
                 cin >> tree_input;
-                myBinaryTree.remove(tree_input);
+                my_binary_tree.remove(tree_input);
                 break;
             case 3:
                 cout << "Enter number to search for: ";
                 cin >> tree_input;
-                if(myBinaryTree.contains(tree_input)){
+                if(my_binary_tree.contains(tree_input)){
                     cout << tree_input << " is in the tree\n";
                 }
                 else{
@@ -266,13 +296,13 @@ void binaryTreeTest() {
                 }
                 break;
             case 4:
-                cout << "Smallest number in tree: " << myBinaryTree.getSmallest() << endl;
+                cout << "Smallest number in tree: " << my_binary_tree.getSmallest() << endl;
                 break;
             case 5:
-                cout << "Largest number in tree: " << myBinaryTree.getLargest() << endl;
+                cout << "Largest number in tree: " << my_binary_tree.getLargest() << endl;
                 break;
             case 6:
-                myBinaryTree.printAll();
+                my_binary_tree.printAll();
                 break;
             default:
                 cout << "Invalid choice!\n";
@@ -378,7 +408,7 @@ void skipListTest() {
             case 2:
                 cout << "Enter a number to remove: ";
                 cin >> list_input;
-                //my_skiplist.remove(list_input);
+                my_skiplist.remove(list_input);
                 break;
             case 3:
                 cout << "Enter a number to find: ";
@@ -422,11 +452,14 @@ void skipListTest() {
 
 void storeBookInTrie(StringTrie &book) {
 
+    string filename("GreatExpectations.txt");
     ifstream myFile;
-    myFile.open("GreatExpectations.txt");
+    myFile.open(filename);
     if(!myFile.is_open()){
         cout << "File in trieTest() didn't open!\n";
     }
+    cout << "Now Loading " << filename << "...\n";
+
     int wordCount = 1;
     int pageCount = 1;
     char c;
