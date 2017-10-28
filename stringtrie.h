@@ -45,10 +45,6 @@ struct StringTrieNode {
     // creates node containing input_char
     explicit StringTrieNode(char input_char);
 
-    bool operator ==(const StringTrieNode* other_node) {
-      return parent == other_node->parent;
-    }
-
     // deletes node and all children nodes in subtrie
     ~StringTrieNode();
 };
@@ -80,6 +76,7 @@ class StringTrie {
 
     // returns total number of words within trie
     int getNumberTotalWords() const;
+
     // returns number of unique words within the trie
     int getNumberUniqueWords() const;
 
@@ -92,14 +89,14 @@ class StringTrie {
     void printAllWithPrefix(const std::string &prefix);
 
     friend class StringRecord;
-    friend class StringSequenceRecord;
+    friend class StringSequenceTrie;
+    friend class StringSequenceTrieNode;
     StringRecord* m_record;
 
  protected:
     // constructs word character by character starting from the
     // last character in the word
-    void buildStringFromFinalNode(StringTrieNode* current_node,
-                                  std::string &word) const;
+    std::string buildStringFromFinalNode(const StringTrieNode *current_node) const;
 
     inline StringTrieNode* getNode(const std::string &word);
 
@@ -117,7 +114,6 @@ class StringTrie {
     void removeSubTrie(StringTrieNode* current);
 
 
-
     StringTrieNode* head;
     int number_of_total_words = 0;
     int number_of_unique_words = 0;
@@ -132,10 +128,6 @@ class StringRecord {
     // add final node (character) of word to map
     // or increment value (occurences) if already in map
     void addWord(StringTrieNode* current_node);
-    
-    // add string and their most likely next and previous strings
-    void addWord(StringTrieNode* current_node, 
-                 std::vector<StringTrieNode*> sequence);
 
     // returns ordered list of occurences
     std::vector<int> getOrderedOccurences();
@@ -155,32 +147,51 @@ class StringRecord {
     std::unordered_map<StringTrieNode*, int> m_record;
 };
 
-class StringSequenceRecord {
+class StringSequenceTrieNode {
  public:
-    StringSequenceRecord(int window_size = 5) : m_window_size(window_size) {
-        m_total_words = 0;
-        m_trie = new StringTrie();
-        std::cout << "Constructing StringSequenceRecord\n";
-    }
+    StringSequenceTrieNode(StringTrieNode* string_trie_node, StringSequenceTrieNode* parent) : m_trie_word_node(string_trie_node), m_times_seen(1), m_parent(parent) {}
+
+    inline void addOneTimeSeen() { m_times_seen += 1; }
+
+    const StringTrieNode* getWordNode();
+
+    inline int getTimesSeen() { return m_times_seen; }
+    std::string getWord();
+
+    // current word in the sequence
+    const StringTrieNode* m_trie_word_node;
+
+    // word that
+    const StringSequenceTrieNode* m_parent;
+
+    friend class StringSequenceTrie;
+
+  protected:
+    std::unordered_map<StringTrieNode*, StringSequenceTrieNode*> m_next_word;
+    int m_times_seen;
+};
+
+class StringSequenceTrie {
+ public:
+    StringSequenceTrie();
 
     // add sequence of strings to record
     void addSequence(const std::string &sequence);
     void addSequenceHelper(const std::string &sequence,
-                     short starting_pos = 0,
-                     short current_window_size = 5);
+                           short starting_pos = 0,
+                           bool add_word_to_trie = true);
+
+    // returns a sequence of strings one string at a time from the last node;
+    std::string buildStringFromEndingNode(StringSequenceTrieNode* current);
 
     void loadTextFile(std::string file_name = "");
 
+ protected:
+    // returns a node pointing to the last node in the sequence
+    const StringSequenceTrieNode* getNode(std::string &sequence);
+
  private:
-    // defines the number of strings ahead of and behind the current string
-     int m_window_size;
-
-     // current word in the sequence
-     const StringTrieNode* current_word;
-
-     // next_word[StringRecord*] returns pair containing the next string
-     // and the frequency of those words
-     std::unordered_map<StringRecord*, std::pair<StringTrieNode*, int>> next_word;
+     StringSequenceTrieNode* head;
      int m_total_words;
 
      // contains dictionary of words that have been used
