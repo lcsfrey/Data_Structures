@@ -32,7 +32,7 @@
 #include "linkedlist.h"
 #include "binaryheap.h"
 #include "skiplist.h"
-#include "wordtrie.h"
+// #include "stringsequencetrie.h"
 
 using namespace std;
 void testMenu();
@@ -53,8 +53,7 @@ int main() {
 
 void testMenu() {
     int choice = -1;
-    while (choice != 0)
-    {
+    while (choice != 0) {
         cout << "Select data structure:\n";
         cout << "0 - Exit\n";
         cout << "1 - Linked List\n";
@@ -65,7 +64,7 @@ void testMenu() {
         cout << "\n";
         cin >> choice;
         cout << endl;
-        switch (choice){
+        switch (choice) {
             case 0:
                 break;
             case 1:
@@ -110,7 +109,7 @@ void linkedListTest() {
         cout << "8 - Print numbers\n";
         cin >> choice;
         cout << endl;
-        switch (choice){
+        switch (choice) {
             case 0:
                 break;
             case 1:
@@ -164,8 +163,7 @@ void trieTest() {
     int choice = -1;
     string temp_word = "";
     StringTrie my_string_trie;
-    while (choice != 0)
-    {
+    while (choice != 0) {
         cout << "\n----------------Trie Test----------------" << endl;
         cout << "Select test method:\n";
         cout << "0 - Exit\n";
@@ -173,26 +171,26 @@ void trieTest() {
         cout << "2 - Add word\n";
         cout << "3 - Print all\n";
         cout << "4 - Print all with prefix\n";
-        cout << "5 - Print all ordered by occurance\n";
-        cout << "6 - Search for word in trie\n";
-        cout << "7 - Remove word\n";
-        cout << "8 - Remove all with prefix\n";
-        cout << "9 - Get longest word\n";
-        cout << "10 - Get length of shortest word\n";
-        cout << "11 - Get length of longest word\n\n";
+        cout << "5 - Print all ordered by occurence\n";
+        cout << "6 - Get number of occurences of word\n";
+        cout << "7 - Search for word in trie\n";
+        cout << "8 - Remove word\n";
+        cout << "9 - Remove all with prefix\n";
+        cout << "10 - Get longest word\n";
+        cout << "11 - Get length of shortest word\n";
+        cout << "12 - Get length of longest word\n\n";
         cin >> choice;
-        switch (choice){
+        switch (choice) {
             case 0:
                 break;
             case 1:
                 storeBookInTrie(my_string_trie);
-
-            break;
+                break;
             case 2:
                 cout << "Enter word to add: ";
                 cin >> temp_word;
                 my_string_trie.addWord(temp_word);
-            break;
+                break;
             case 3:
                 my_string_trie.printAll();
                 break;
@@ -202,56 +200,58 @@ void trieTest() {
                 my_string_trie.printAllWithPrefix(temp_word);
                 break;
             case 5: {
-
                 std::vector<pair<string, int>> words_by_frequency = my_string_trie.m_record->getOrderedWords(&my_string_trie);
                 int size = words_by_frequency.size();
                 string word = "";
                 cout << "\nWords By Occurences\n----------------------------\n";
                 for (int i = 0; i < size / 2; i++) {
                     pair<string, int> pair_word_freq = words_by_frequency[i];
-                    cout << "word " << i << ": " << pair_word_freq.first
-                         << "\nfrequency: " << pair_word_freq.second << endl << endl;
+                    cout << i << ":   " << pair_word_freq.first
+                         << "\nfrequency: " << pair_word_freq.second << " / "
+                         << my_string_trie.getNumberTotalWords() << " words\n\n";
                 }
                 break;
             }
             case 6:
                 cout << "Enter word to search for: ";
                 cin >> temp_word;
-                if(my_string_trie.contains(temp_word)){
+                cout << temp_word << " has occured "
+                     << my_string_trie.getNumberOccurences(temp_word) << " times\n";
+                break;
+            case 7:
+                cout << "Enter word to search for: ";
+                cin >> temp_word;
+                if(my_string_trie.contains(temp_word)) {
                     std::cout << temp_word << " is in the trie\n";
-                }
-                else{
+                } else {
                     std::cout << temp_word << " is not in the trie\n";
                 }
                 break;
-            case 7:
+            case 8:
                 cout << "Enter word to remove: ";
                 cin >> temp_word;
                 my_string_trie.remove(temp_word);
                 break;
-            case 8:
+            case 9:
                 cout << "Enter prefix: ";
                 cin >> temp_word;
                 my_string_trie.removeAllWithPrefix(temp_word);
                 break;
-            case 9:
+            case 10:
                 cout << "Longest word: " << my_string_trie.getLongestWord() << endl;
                 break;
-            case 10:
+            case 11:
                 cout << "Length of shortest word: " << my_string_trie.getLengthOfShortestWord() << endl;
                 break;
-            case 11:
+            case 12:
                 cout << "Length of longest word: " << my_string_trie.getLengthOfLongestWord() << endl;
                 break;
-
             default:
                 cout << "Invalid choice!\n";
                 break;
         }
-
-      }
-
     }
+}
 
 
 void binaryTreeTest() {
@@ -259,8 +259,7 @@ void binaryTreeTest() {
     int choice = -1;
     int tree_input = 0;
 
-    while (choice != 0)
-    {
+    while (choice != 0) {
         cout << "----------------Binary Tree Test----------------" << endl;
         cout << "Select test method:\n";
         cout << "0 - Exit\n";
@@ -272,7 +271,7 @@ void binaryTreeTest() {
         cout << "6 - Print numbers in ascending order\n";
         cin >> choice;
         cout << endl;
-        switch (choice){
+        switch (choice) {
             case 0:
                 break;
             case 1:
@@ -288,7 +287,7 @@ void binaryTreeTest() {
             case 3:
                 cout << "Enter number to search for: ";
                 cin >> tree_input;
-                if(my_binary_tree.contains(tree_input)){
+                if(my_binary_tree.contains(tree_input)) {
                     cout << tree_input << " is in the tree\n";
                 }
                 else{
@@ -330,7 +329,7 @@ void heapTest() {
         cout << "6 - Add random values\n";
         cin >> choice;
         cout << endl;
-        switch (choice){
+        switch (choice) {
             case 0:
                 break;
             case 1:
@@ -385,8 +384,7 @@ void skipListTest() {
     SkipList<int> my_skiplist;
     int choice = -1;
     int list_input = 0;
-    while (choice != 0)
-    {
+    while (choice != 0) {
         cout << "----------------Skip List Test----------------" << endl;
         cout << "Select test method:\n";
         cout << "0 - Exit\n";
@@ -397,7 +395,7 @@ void skipListTest() {
         cout << "5 - Print numbers\n";
         cin >> choice;
         cout << endl;
-        switch (choice){
+        switch (choice) {
             case 0:
                 break;
             case 1:
@@ -455,7 +453,7 @@ void storeBookInTrie(StringTrie &book) {
     string filename("GreatExpectations.txt");
     ifstream myFile;
     myFile.open(filename);
-    if(!myFile.is_open()){
+    if(!myFile.is_open()) {
         cout << "File in trieTest() didn't open!\n";
     }
     cout << "Now Loading " << filename << "...\n";
@@ -465,15 +463,15 @@ void storeBookInTrie(StringTrie &book) {
     char c;
     string temp_word;
     clock_t start = clock();
-    while (!myFile.eof()){
+    while (!myFile.eof()) {
         myFile >> temp_word;
-        if(temp_word == "----------------------------------------"){
+        if(temp_word == "----------------------------------------") {
             pageCount++;
             wordCount = 1;
         }
-        else{
+        else {
             c = temp_word[0];
-            if(c < 90 && c > 63){
+            if(c < 90 && c > 63) {
                 c = c + 32;
             }
             temp_word = c + temp_word.substr(1, temp_word.size() - 1);
