@@ -34,15 +34,14 @@
 #include <algorithm>
 #include <fstream>
 #include <chrono>
+#include <iomanip>
 
-StringTrieNode::StringTrieNode(char input_char)
-  : data(input_char),
-    m_paths(),
-    parent(nullptr),
-    is_a_word(false) {}
+StringTrieNode::StringTrieNode(const char &input_char) : data(input_char),
+                                                         is_a_word(false),
+                                                         parent(nullptr),
+                                                         m_paths() {}
 
-StringTrieNode::~StringTrieNode() {
-}
+StringTrieNode::~StringTrieNode() {}
 
 void StringTrie::removeSubTrie(StringTrieNode* current) {
     for (const std::pair<char, StringTrieNode*>& iter : current->m_paths) {
@@ -58,6 +57,14 @@ StringTrie::StringTrie() {
 
 StringTrie::~StringTrie() {
     removeSubTrie(head);
+}
+
+void StringTrie::resetTrie() {
+    removeSubTrie(head);
+    head = new StringTrieNode('\0');
+    m_record = new StringRecord();
+    number_of_total_words = 0;
+    number_of_unique_words = 0;
 }
 
 void StringTrie::addWord(const std::string &word) {
@@ -162,13 +169,13 @@ void StringTrie::removeAllWithPrefix(const std::string &prefix) {
     removeSubTrie(current_node);
 }
 
-void StringTrie::printAll() {
+void StringTrie::printAll() const {
     printAllHelper(head, "");
 }
 
 // prints all words with a given prefix
 // input: prefix of words to print
-void StringTrie::printAllWithPrefix(const std::string &prefix) {
+void StringTrie::printAllWithPrefix(const std::string &prefix) const {
     std::map<char, StringTrieNode*>* current_map = &head->m_paths;
     StringTrieNode* current_node = head;
     const char* c_string_prefix = prefix.c_str();
@@ -184,6 +191,17 @@ void StringTrie::printAllWithPrefix(const std::string &prefix) {
         current_map = &current_node->m_paths;
     }
     printAllHelper(current_node, prefix);
+}
+
+void StringTrie::printAllByOccurences(int upper_limit, int lower_limit) const {
+    std::vector<std::pair<std::string, int>> pairs = m_record->getOrderedWords(this, upper_limit, lower_limit);
+    std::cout << "Rank  | Frequency | String" << std::endl;
+    int i = 1;
+    for (std::pair<std::string, int> &pair : pairs) {
+        std::cout << std::setw(5)<< i++ << std::setw(2)
+                  << "|" << std::setw(10) << pair.second << std::setw(2)
+                  << "|" << pair.first << std::endl;
+    }
 }
 
 // prints all words in subtree,
@@ -203,6 +221,15 @@ int StringTrie::getNumberTotalWords() const {
 
 int StringTrie::getNumberUniqueWords() const {
     return number_of_unique_words;
+}
+
+int StringTrie::getNumberOccurences(const std::string &word) {
+    StringTrieNode* word_node(getNode(word));
+    if (word_node != nullptr) {
+        return m_record->getNumberOccurences(word_node);
+    } else {
+        return 0;
+    }
 }
 
 std::string StringTrie::getLongestWord() const {
@@ -304,10 +331,14 @@ void StringRecord::addWord(StringTrieNode *current_node) {
     }
 }
 
+int StringRecord::getNumberOccurences(StringTrieNode *word_node) const {
+    return m_record.at(word_node);
+}
+
 
 std::vector<std::pair<std::string, int>> StringRecord::getOrderedWords(const StringTrie *trie,
-                                                                       const int lower_limit,
-                                                                       const int upper_limit) {
+                                                                       const int upper_limit,
+                                                                       const int lower_limit) {
     std::vector<std::pair<std::string, int>> words;
     int word_occurences = 0;
     std::string word = "";
@@ -338,137 +369,3 @@ std::vector<int> StringRecord::getOrderedOccurences() {
     std::sort(occurences.begin(), occurences.end(), std::greater<int>());
     return occurences;
 }
-
-StringSequenceTrie::StringSequenceTrie() : m_total_words(0),
-                                           m_trie(new StringTrie()),
-                                           head(new StringSequenceTrieNode(m_trie->head, nullptr)) {}
-
-void StringSequenceTrie::addSequence(const std::string &sequence) {
-    addSequenceHelper(sequence, 0, true);
-    // std::cout << "Adding to Sequence Trie: " << sequence << std::endl;
-}
-
-void StringSequenceTrie::addSequenceHelper(const std::string &sequence,
-                                             short starting_pos,
-                                             bool add_word_to_trie) {
-
-    // verify we have a sequence to look at
-    std::size_t size = sequence.size();
-
-    std::size_t space_index = -1;
-
-    std::string str = "";
-    StringTrieNode* current_trie_node = nullptr;
-    StringSequenceTrieNode* current_sequence_node = head;
-    StringSequenceTrieNode* parent = head;
-    do {
-        space_index = sequence.find(" ", starting_pos);
-        // check and verify there is a space in the string, else return
-        if (space_index < size) {
-            str = sequence.substr(starting_pos, space_index - starting_pos);
-        } else {
-            str = sequence.substr(starting_pos, size - starting_pos);
-        }
-
-        if (add_word_to_trie) {
-            m_trie->addWord(str);
-        }
-        current_trie_node = m_trie->getNode(str);
-
-        if (current_sequence_node->m_next_word.find(current_trie_node) == current_sequence_node->m_next_word.end()) {
-            current_sequence_node->m_next_word[current_trie_node] = new StringSequenceTrieNode(current_trie_node, parent);
-            current_sequence_node = current_sequence_node->m_next_word[current_trie_node];
-        } else {
-            current_sequence_node = current_sequence_node->m_next_word[current_trie_node];
-            current_sequence_node->addOneTimeSeen();
-        }
-
-        parent = current_sequence_node;
-
-        if (space_index >= size) return;
-        // add sequence of words starting at current_pos
-        addSequenceHelper(sequence, (int)space_index + 1, add_word_to_trie);
-        add_word_to_trie = false;
-        starting_pos = space_index + 1;
-     } while (space_index < size);
-}
-
-const StringSequenceTrieNode *StringSequenceTrie::getNode(std::string &sequence)
-{
-  // verify we have a sequence to look at
-  std::size_t size = sequence.size();
-
-  // find the next space in the sentence
-  std::size_t space_index = sequence.find(" ");
-
-  std::string str = "";
-  StringTrieNode* current_trie_node = nullptr;
-  int current_pos = 0;
-  StringSequenceTrieNode* current_record_node = head;
-
-  do {
-      // check and verify there is a space in the string, else return
-      if (space_index < size) {
-          str = sequence.substr(current_pos, space_index - current_pos);
-      } else {
-          str = sequence.substr(current_pos, size - current_pos);
-      }
-
-      // check if the word is in m_trie
-      // if it is not, then it wouldn't be in the sequence record
-      current_trie_node = m_trie->getNode(str);
-      if (current_trie_node == nullptr) {
-          return nullptr;
-      }
-
-      if (current_record_node->m_next_word.find(current_trie_node) == current_record_node->m_next_word.end()) {
-          return nullptr;
-      } else {
-          current_record_node = current_record_node->m_next_word[current_trie_node];
-      }
-  } while (space_index < size);
-  return current_record_node;
-}
-
-
-void StringSequenceTrie::loadTextFile(std::string file_name) {
-  if (file_name == "") file_name = "GreatExpectations.txt";
-  std::ifstream my_file;
-  my_file.open(file_name);
-  if(!my_file.is_open()){
-      std::cout << "File in trieTest() didn't open!\n";
-  }
-  std::cout << "Now Loading " << file_name << "...\n";
-
-  char* c;
-  std::string temp_word;
-  std::clock_t start = clock();
-  std::string sequence = "";
-
-  int count = 1;
-  my_file >> sequence;
-  // Add 5 words in queue together and add sequence to StringSequenceTrie
-  while (!my_file.eof() && count < 5){
-      my_file >> temp_word;
-      if(temp_word != "----------------------------------------"){
-          sequence += " " + temp_word;
-          count++;
-      }
-  }
-
-  addSequence(sequence);
-
-  while (!my_file.eof()) {
-      my_file >> temp_word;
-      if(temp_word != "----------------------------------------"){
-          int space = sequence.find(" ");
-          sequence.erase(0, space + 1);
-          sequence.append(" " + temp_word);
-          addSequence(sequence);
-      }
-  }
-  std::clock_t duration = clock() - start;
-  std::cout << "Time taken: " << duration / (double)CLOCKS_PER_SEC << std::endl;
-  my_file.close();
-}
-
