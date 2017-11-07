@@ -32,13 +32,14 @@
 #include "linkedlist.h"
 #include "binaryheap.h"
 #include "skiplist.h"
-// #include "stringsequencetrie.h"
+ #include "stringsequencetrie.h"
 
 using namespace std;
 void testMenu();
 void linkedListTest();
 void binaryTreeTest();
 void trieTest();
+void sequenceTrieTest();
 void heapTest();
 void skipListTest();
 void storeBookInTrie(StringTrie &book);
@@ -60,7 +61,8 @@ void testMenu() {
         cout << "2 - Skip List\n";
         cout << "3 - Binary Tree\n";
         cout << "4 - String Trie\n";
-        cout << "5 - Binary Heap";
+        cout << "5 - Sequence Trie\n";
+        cout << "6 - Binary Heap";
         cout << "\n";
         cin >> choice;
         cout << endl;
@@ -80,6 +82,9 @@ void testMenu() {
                 trieTest();
                 break;
             case 5:
+                sequenceTrieTest();
+                break;
+            case 6:
                 heapTest();
             break;
             default:
@@ -251,6 +256,46 @@ void trieTest() {
                 break;
         }
     }
+}
+
+void sequenceTrieTest() {
+  int choice(-1);
+  string sequence("");
+  string filename("");
+  StringSequenceTrie my_string_sequence_trie;
+  while (choice != 0) {
+      cout << "\n----------------Sequence Trie Test----------------" << endl;
+      cout << "Select test method:\n";
+      cout << "0 - Exit\n";
+      cout << "1 - Import sequences from text\n";
+      cout << "2 - Add sequence\n";
+      cout << "3 - Print all sequences ordered by occurence\n";
+      cin >> choice;
+      switch (choice) {
+          case 0:
+              break;
+          case 1: {
+              cout << "Enter full name of text file: ";
+              cin >> filename;
+              my_string_sequence_trie.loadTextFile(filename);
+              break;
+          }
+          case 2: {
+            cout << "Enter sequence: ";
+              cin >> sequence;
+              my_string_sequence_trie.addSequence(sequence);
+              break;
+          }
+          case 3: {
+              cin >> filename;
+              my_string_sequence_trie.printOrderedWords("",INT32_MAX,2,10,INT32_MAX,3);
+              break;
+          }
+          default:
+              cout << "Invalid choice!\n";
+              break;
+      }
+  }
 }
 
 
