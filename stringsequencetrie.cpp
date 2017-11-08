@@ -35,6 +35,8 @@
 #include "stringsequencetrie.h"
 #include "stringtrie.h"
 
+
+
 StringSequenceTrieNode::StringSequenceTrieNode(StringTrieNode *string_trie_node,
                                                StringSequenceTrieNode *parent)  : m_trie_word_node(string_trie_node),
                                                                                   m_parent(parent), m_next_word(),
@@ -247,8 +249,25 @@ StringSequenceTrieNode* StringSequenceTrie::getNode(const std::string &sequence)
 }
 
 
+bool isPunctNotPeriod(const char &c) {
+    if (std::ispunct(c) && c != '.') {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+void cleanString(std::string &str) {
+    std::string output;
+    std::remove_copy_if(str.begin(), str.end(),
+                            std::back_inserter(output),
+                            std::ptr_fun(isPunctNotPeriod));
+    str.assign(std::move(output));
+}
+
 void StringSequenceTrie::loadTextFile(std::string file_name, int window_size) {
-    if (file_name == "") file_name = "GreatExpectations.txt";
+    if (file_name == "") file_name = "books/AliceInWonderland.txt";
+    else file_name = "books/" + file_name;
     std::ifstream my_file;
     my_file.open(file_name);
     if(!my_file.is_open()){
@@ -265,17 +284,20 @@ void StringSequenceTrie::loadTextFile(std::string file_name, int window_size) {
     // Add 5 words in queue together and add sequence to StringSequenceTrie
     while (!my_file.eof() && count < window_size){
         my_file >> temp_word;
-        if(temp_word != "----------------------------------------"){
+        cleanString(temp_word);
+        if (temp_word != "" && temp_word != " ") {
             sequence += " " + temp_word;
             count++;
         }
+
     }
 
     addSequence(sequence);
 
     while (!my_file.eof()) {
         my_file >> temp_word;
-        if(temp_word != "----------------------------------------"){
+        cleanString(temp_word);
+        if(temp_word != ""){
             int space = sequence.find(" ");
             sequence.erase(0, space + 1);
             sequence.append(" " + temp_word);

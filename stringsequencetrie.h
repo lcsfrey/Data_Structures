@@ -27,9 +27,7 @@
 #ifndef STRINGSEQUENCETRIE_H
 #define STRINGSEQUENCETRIE_H
 
-
 #include "stringtrie.h"
-
 
 class StringSequenceTrieNode {
  public:
@@ -38,21 +36,19 @@ class StringSequenceTrieNode {
 
     inline void addOneTimeSeen() { m_times_seen += 1; }
 
-    const StringTrieNode* getWordNode();
-
     inline int getTimesSeen() { return m_times_seen; }
 
     std::string getWord();
 
+    friend class StringSequenceTrie;
+
+  protected:
     // current word in the sequence
     const StringTrieNode* m_trie_word_node;
 
     // pointer to previous word in sequence
     const StringSequenceTrieNode* m_parent;
 
-    friend class StringSequenceTrie;
-
-  protected:
     std::unordered_map<StringTrieNode*, StringSequenceTrieNode*> m_next_word;
 
     int m_times_seen;
@@ -62,12 +58,18 @@ class StringSequenceTrie {
  public:
     StringSequenceTrie();
 
-    // add sequence of strings separated by spaces to record
+    // add sequence of strings separated by spaces to trie
     void addSequence(const std::string &sequence);
 
-    // add sequence of strings from vector to record
+    // add sequence of strings from vector to trie
     void addSequence(std::vector<std::string> &sequence, int window_size = 5);
 
+    // returns a vector of StringSequenceTrieNode pointers ordered by the number
+    // of times that node (the sequence ending with the word contained in that node)
+    // has been seen.
+    // The function can be restricted to only return nodes within a range of lengths.
+    // A branching factor can be specified which affects how many unique words at
+    // each branch will be checked.
     std::vector<StringSequenceTrieNode*> getOrderedWords(const std::string sequence = "",
                                                          int sequence_length_upper_limit = INT32_MAX,
                                                          int sequence_length_lower_limit = 1,
