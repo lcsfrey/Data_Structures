@@ -73,14 +73,14 @@ class StringSequenceTrie {
     std::vector<StringSequenceTrieNode*> getOrderedWords(const std::string sequence = "",
                                                          int sequence_length_upper_limit = INT32_MAX,
                                                          int sequence_length_lower_limit = 1,
-                                                         int branching_factor = 5);
+                                                         int branching_factor = 5) const;
 
     void printOrderedWords(const std::string sequence = "",
                            int sequence_length_upper_limit = INT32_MAX,
                            int sequence_length_lower_limit = 1,
                            int branching_factor = 5,
                            int frequency_upper_limit = INT32_MAX,
-                           int frequency_lower_limit = 0);
+                           int frequency_lower_limit = 0) const;
 
     // returns a sequence of strings one string at a time from the last node;
     std::string buildSequenceFromFinalNode(const StringSequenceTrieNode *current) const;
@@ -101,7 +101,7 @@ class StringSequenceTrie {
                                const int &sequence_length_upper_limit = INT32_MAX,
                                const int &sequence_length_lower_limit = 1,
                                int current_sequence_length = 0,
-                               int branching_factor = 5);
+                               int branching_factor = 5) const;
 
  private:
     // contains dictionary of words that have been used

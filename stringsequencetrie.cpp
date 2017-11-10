@@ -83,7 +83,7 @@ void StringSequenceTrie::addSequence(std::vector<std::string> &sequence, int win
 std::vector<StringSequenceTrieNode*> StringSequenceTrie::getOrderedWords(const std::string sequence,
                                                                          int sequence_length_upper_limit,
                                                                          int sequence_length_lower_limit,
-                                                                         int branching_factor) {
+                                                                         int branching_factor) const {
     std::vector<StringSequenceTrieNode*> sequences;
     StringSequenceTrieNode* current_node = nullptr;
 
@@ -110,7 +110,7 @@ void StringSequenceTrie::getOrderedWordsHelper(const StringSequenceTrieNode *cur
                                                const int &sequence_length_upper_limit,
                                                const int &sequence_length_lower_limit,
                                                int current_sequence_length,
-                                               int branching_factor) {
+                                               int branching_factor) const {
 
     if (current_sequence_length > sequence_length_upper_limit) return;
 
@@ -145,7 +145,7 @@ void StringSequenceTrie::printOrderedWords(const std::string sequence,
                                            int sequence_length_lower_limit,
                                            int branching_factor,
                                            int frequency_upper_limit,
-                                           int frequency_lower_limit) {
+                                           int frequency_lower_limit) const {
     std::vector<StringSequenceTrieNode*> sequences = getOrderedWords(sequence,
                                                                      sequence_length_upper_limit,
                                                                      sequence_length_lower_limit,

@@ -258,44 +258,101 @@ void trieTest() {
     }
 }
 
-void sequenceTrieTest() {
-  int choice(-1);
-  string sequence("");
-  string filename("");
-  StringSequenceTrie my_string_sequence_trie;
-  while (choice != 0) {
-      cout << "\n----------------Sequence Trie Test----------------" << endl;
-      cout << "Select test method:\n";
-      cout << "0 - Exit\n";
-      cout << "1 - Import sequences from text\n";
-      cout << "2 - Add sequence\n";
-      cout << "3 - Print all sequences ordered by occurence\n";
+void sequenceTrieTestPrintHelper(const StringSequenceTrie &my_string_sequence_trie) {
+  int upper_freq_limit = INT32_MAX;
+  int lower_freq_limit = 1;
+  int upper_length_limit = INT32_MAX;
+  int lower_length_limit = 1;
+  string starting_sequence;
+  int choice = -1;
+  do {
+      cout << "\n----------------Print sequences by occurence----------------\n"
+           << "Starting sequence: \"" << starting_sequence << "\"\n"
+           << "Upper frequency limit: " << upper_freq_limit << " occurences\n"
+           << "Lower frequency limit: " << lower_freq_limit
+           << " occurence" + (lower_freq_limit > 1 ? string("s\n") : string("\n"))
+           << "Upper word count limit: " << upper_length_limit << " words\n"
+           << "Lower word count limit: " << lower_length_limit
+           << " word"  + (lower_length_limit > 1 ? string("s\n\n") : string("\n\n"))
+           << "0 - Back\n"
+           << "1 - Edit starting sequence\n"
+           << "2 - Edit upper frequency limit\n"
+           << "3 - Edit lower frequency limit\n"
+           << "4 - Edit upper word count limit\n"
+           << "5 - Edit lower word count limit\n"
+           << "6 - Print sequences in range\n"
+           << "Select choice: ";
       cin >> choice;
+      cin.ignore();
       switch (choice) {
-          case 0:
+          case 1:
+              cout << "Enter starting sequence: ";
+              std::getline(std::cin, starting_sequence);
               break;
-          case 1: {
-              cout << "Enter full name of text file: ";
-              cin >> filename;
-              my_string_sequence_trie.loadTextFile(filename);
+          case 2:
+              cout << "Enter upper frequency limit: ";
+              cin >> upper_freq_limit;
               break;
-          }
-          case 2: {
-            cout << "Enter sequence: ";
-              cin >> sequence;
-              my_string_sequence_trie.addSequence(sequence);
+          case 3:
+              cout << "Enter lower frequency limit: ";
+              cin >> lower_freq_limit;
               break;
-          }
-          case 3: {
-              cin >> filename;
-              my_string_sequence_trie.printOrderedWords("",INT32_MAX,2,10,INT32_MAX,3);
+          case 4:
+              cout << "Enter upper word count limit: ";
+              cin >> upper_length_limit;
               break;
-          }
-          default:
-              cout << "Invalid choice!\n";
+          case 5:
+              cout << "Enter lower word count limit: ";
+              cin >> lower_length_limit;
+              break;
+          case 6:
+              my_string_sequence_trie.printOrderedWords(starting_sequence, upper_length_limit,
+                                                        lower_length_limit, 10,
+                                                        upper_freq_limit, lower_freq_limit);
               break;
       }
-  }
+  } while (choice != 0);
+}
+
+void sequenceTrieTest() {
+    int choice(-1);
+    string sequence("");
+    string filename("");
+    StringSequenceTrie my_string_sequence_trie;
+    while (choice != 0) {
+        cout << "\n----------------Sequence Trie Test----------------" << endl;
+        cout << "Select test method:\n";
+        cout << "0 - Exit\n";
+        cout << "1 - Import sequences from text\n";
+        cout << "2 - Add sequence\n";
+        cout << "3 - Print all sequences ordered by occurence\n";
+        cout << "4 - Print sequences by occurences in range\n";
+        cin >> choice;
+        switch (choice) {
+            case 0:
+                break;
+            case 1:
+                cout << "Enter full name of text file: ";
+                cin >> filename;
+                my_string_sequence_trie.loadTextFile(filename);
+                break;
+            case 2:
+                cout << "Enter sequence: ";
+                cin >> sequence;
+                my_string_sequence_trie.addSequence(sequence);
+                break;
+            case 3:
+                my_string_sequence_trie.printOrderedWords("",INT32_MAX,1,10,INT32_MAX,1);
+                break;
+            case 4: {
+                sequenceTrieTestPrintHelper(my_string_sequence_trie);
+                break;
+            }
+            default:
+                cout << "Invalid choice!\n";
+                break;
+        }
+    }
 }
 
 
