@@ -168,17 +168,19 @@ void trieTest() {
         cout << "Select test method:\n";
         cout << "0 - Exit\n";
         cout << "1 - Import book\n";
-        cout << "2 - Add word\n";
-        cout << "3 - Print all\n";
-        cout << "4 - Print all with prefix\n";
-        cout << "5 - Print all ordered by occurence\n";
-        cout << "6 - Get number of occurences of word\n";
-        cout << "7 - Search for word in trie\n";
-        cout << "8 - Remove word\n";
-        cout << "9 - Remove all with prefix\n";
-        cout << "10 - Get longest word\n";
-        cout << "11 - Get length of shortest word\n";
-        cout << "12 - Get length of longest word\n\n";
+        cout << "2 - Load/Save\n";
+        cout << "3 - Add word\n";
+        cout << "4 - Print all\n";
+        cout << "5 - Print all with prefix\n";
+        cout << "6 - Print all ordered by occurence\n";
+        cout << "7 - Print ordered occurences in range\n";
+        cout << "8 - Get number of occurences of word\n";
+        cout << "9 - Search for word in trie\n";
+        cout << "10 - Remove word\n";
+        cout << "11 - Remove all with prefix\n";
+        cout << "12 - Get longest word\n";
+        cout << "13 - Get length of shortest word\n";
+        cout << "14 - Get length of longest word\n";
         cin >> choice;
         switch (choice) {
             case 0:
@@ -186,39 +188,54 @@ void trieTest() {
             case 1:
                 storeBookInTrie(my_string_trie);
                 break;
-            case 2:
+            case 2: {
+                cout << "Select method:\n0 - Back\n1 - Load\n2 - Save\nChoice: ";
+                cin >> choice;
+                if(choice != 0) {
+                    cout << "Enter full text name (e.g. example.txt)\n";
+                    cin >> temp_word;
+                    if (choice == 1)  {
+                        my_string_trie.readFromFile(temp_word);
+                    } else {
+                        my_string_trie.writeToFile(temp_word);
+                    }
+                }
+                choice = -1;
+                break;
+            }
+            case 3:
                 cout << "Enter word to add: ";
                 cin >> temp_word;
                 my_string_trie.addWord(temp_word);
                 break;
-            case 3:
+            case 4:
                 my_string_trie.printAll();
                 break;
-            case 4:
+            case 5:
                 cout << "Enter prefix: ";
                 cin >> temp_word;
                 my_string_trie.printAllWithPrefix(temp_word);
                 break;
-            case 5: {
-                std::vector<pair<string, int>> words_by_frequency = my_string_trie.m_record->getOrderedWords(&my_string_trie);
-                int size = words_by_frequency.size();
-                string word = "";
-                cout << "\nWords By Occurences\n----------------------------\n";
-                for (int i = 0; i < size / 2; i++) {
-                    pair<string, int> pair_word_freq = words_by_frequency[i];
-                    cout << i << ":   " << pair_word_freq.first
-                         << "\nfrequency: " << pair_word_freq.second << " / "
-                         << my_string_trie.getNumberTotalWords() << " words\n\n";
-                }
+            case 6:
+                my_string_trie.printAllByOccurences();
+                break;
+            case 7: {
+                int upper_limit = INT32_MAX;
+                int lower_limit = 1;
+                cout << "Enter upper limit on word frequency: ";
+                cin >> upper_limit;
+                cout << "Enter lower limit on word frequency: ";
+                cin >> lower_limit;
+                my_string_trie.printOccurencesInRange(upper_limit, lower_limit);
                 break;
             }
-            case 6:
+            case 8:
                 cout << "Enter word to search for: ";
                 cin >> temp_word;
                 cout << temp_word << " has occured "
                      << my_string_trie.getNumberOccurences(temp_word) << " times\n";
                 break;
-            case 7:
+            case 9:
                 cout << "Enter word to search for: ";
                 cin >> temp_word;
                 if(my_string_trie.contains(temp_word)) {
@@ -227,23 +244,23 @@ void trieTest() {
                     std::cout << temp_word << " is not in the trie\n";
                 }
                 break;
-            case 8:
+            case 10:
                 cout << "Enter word to remove: ";
                 cin >> temp_word;
                 my_string_trie.remove(temp_word);
                 break;
-            case 9:
+            case 11:
                 cout << "Enter prefix: ";
                 cin >> temp_word;
                 my_string_trie.removeAllWithPrefix(temp_word);
                 break;
-            case 10:
+            case 12:
                 cout << "Longest word: " << my_string_trie.getLongestWord() << endl;
                 break;
-            case 11:
+            case 13:
                 cout << "Length of shortest word: " << my_string_trie.getLengthOfShortestWord() << endl;
                 break;
-            case 12:
+            case 14:
                 cout << "Length of longest word: " << my_string_trie.getLengthOfLongestWord() << endl;
                 break;
             default:
