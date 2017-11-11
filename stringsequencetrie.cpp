@@ -1,9 +1,10 @@
 
-#include "stringsequencetrie.h"
-#include "stringtrie.h"
 #include <ctime>
 #include <fstream>
 #include <string>
+
+#include "stringsequencetrie.h"
+#include "stringtrie.h"
 
 StringSequenceTrieNode::StringSequenceTrieNode(StringTrieNode *string_trie_node,
                                                StringSequenceTrieNode *parent)  : m_trie_word_node(string_trie_node),
@@ -54,6 +55,30 @@ std::string StringSequenceTrie::buildSequenceFromFinalNode(const StringSequenceT
     } else {
         return "";
     }
+}
+
+void StringSequenceTrie::writeToFile(std::string filename) const {
+    std::ofstream outfile(filename);
+    int branches = 0;
+    branches = this->head->m_next_word.size();
+    outfile << branches << std::endl;
+    for(const auto starting_word : head->m_next_word) {
+        writeToFileHelper(outfile, starting_word.second);
+    }
+}
+
+void StringSequenceTrie::writeToFileHelper(std::ofstream &outfile,
+                                           const StringSequenceTrieNode *current_node) const {
+    int current_size = current_node->m_next_word.size();
+    outfile << buildStringFromFinalNode(current_node->m_trie_word_node) << " "
+            << current_node->m_times_seen << " "
+            << current_size << " ";
+
+    if (current_size != 0)
+        for(const auto starting_word : head->m_next_word)
+            writeToFileHelper(outfile, starting_word.second);
+    else
+        outfile << std::endl;
 }
 
 void StringSequenceTrie::addSequenceHelper(const std::string &sequence,
@@ -135,14 +160,14 @@ StringSequenceTrieNode* StringSequenceTrie::getNode(const std::string &sequence)
 }
 
 
-void StringSequenceTrie::loadTextFile(std::string file_name) {
-  if (file_name == "") file_name = "GreatExpectations.txt";
+void StringSequenceTrie::loadTextFile(std::string filename) {
+  if (filename == "") filename = "GreatExpectations.txt";
   std::ifstream my_file;
-  my_file.open(file_name);
+  my_file.open(filename);
   if(!my_file.is_open()){
       std::cout << "File in trieTest() didn't open!\n";
   }
-  std::cout << "Now Loading " << file_name << "...\n";
+  std::cout << "Now Loading " << filename << "...\n";
 
   std::string temp_word;
   std::clock_t start = clock();

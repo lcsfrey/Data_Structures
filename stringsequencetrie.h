@@ -1,6 +1,34 @@
+/************************************************************************************
+**                                                                                 **
+**  MIT License                                                                    **
+**                                                                                 **
+**  Copyright (c) 2017 Lucas Frey                                                  **
+**                                                                                 **
+**  Permission is hereby granted, free of charge, to any person obtaining          **
+**  a copy of this software and associated documentation files (the "Software"),   **
+**  to deal in the Software without restriction, including without limitation      **
+**  the rights to use, copy, modify, merge, publish, distribute, sublicense,       **
+**  and/or sell copies of the Software, and to permit persons to whom the          **
+**  Software is furnished to do so, subject to the following conditions:           **
+**                                                                                 **
+**  The above copyright notice and this permission notice shall be included        **
+**  in all copies or substantial portions of the Software.                         **
+**                                                                                 **
+**  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS        **
+**  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,    **
+**  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE    **
+**  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER         **
+**  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,  **
+**  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE  **
+**  SOFTWARE.                                                                      **
+**                                                                                 **
+************************************************************************************/
+
 #ifndef STRINGSEQUENCETRIE_H
 #define STRINGSEQUENCETRIE_H
 
+#include <unordered_map>
+#include <vector>
 
 #include "stringtrie.h"
 
@@ -31,7 +59,7 @@ class StringSequenceTrieNode {
     int m_times_seen;
 };
 
-class StringSequenceTrie {
+class StringSequenceTrie : StringTrie {
  public:
     StringSequenceTrie();
 
@@ -42,9 +70,15 @@ class StringSequenceTrie {
     void addSequence(std::vector<std::string> &sequence, int window_size = 5);
 
     // returns a sequence of strings one string at a time from the last node;
-    std::string buildSequenceFromFinalNode(const StringSequenceTrieNode *current) const;
+    std::string buildSequenceFromFinalNode(const StringSequenceTrieNode* current) const;
 
-    void loadTextFile(std::string file_name = "");
+    void writeToFile(std::string filename = "trieFile.txt") const;
+    void writeToFileHelper(std::ofstream &outfile,
+                           const StringSequenceTrieNode *current_node) const;
+
+    void readFromFile(std::string filename = "trieFile.txt");
+
+    void loadTextFile(std::string filename = "");
 
  protected:
     // returns a node pointing to the last node in the sequence
