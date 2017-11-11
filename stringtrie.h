@@ -92,7 +92,14 @@ class StringTrie {
 
     void printAll() const;
     void printAllWithPrefix(const std::string &prefix) const;
-    void printAllByOccurences(int upper_limit = INT32_MAX, int lower_limit = 0) const;
+    void printAllByOccurences() const;
+    void printOccurencesInRange(int upper_limit = INT32_MAX, int lower_limit = 0) const;
+
+    void writeToFile(std::string filename = "trieFile.txt") const;
+    void writeToFileHelper(std::ofstream &outfile, const StringTrieNode *current_node) const;
+
+    void readFromFile(std::string filename = "trieFile.txt");
+    void readFromFileHelper(std::ifstream &infile, StringTrieNode *current_node) const;
 
     friend class StringRecord;
     friend class StringSequenceTrie;
@@ -134,15 +141,15 @@ class StringRecord {
 
     // add final node (character) of word to map
     // or increment value (occurences) if already in map
-    void addWord(StringTrieNode* current_node);
+    void addWord(const StringTrieNode* current_node, int occurences = 1);
 
-    int getNumberOccurences(StringTrieNode *word_node) const;
+    int getNumberOccurences(const StringTrieNode *word_node) const;
 
     // returns ordered list of occurences
     std::vector<int> getOrderedOccurences();
     
     // returns map of associating StringTrieNode pointers and their frequency
-    inline const std::unordered_map<StringTrieNode*, int>* getRecord() { return &m_record; }
+    inline const std::unordered_map<const StringTrieNode*, int>* getRecord() { return &m_record; }
     
     // returns ordered list of strings and their occurences
     std::vector<std::pair<std::string, int>> getOrderedWords(const StringTrie *trie,
@@ -152,7 +159,7 @@ class StringRecord {
  protected:
     // map of key containing the final node (character) of
     // the word and the number of times it has been seen
-    std::unordered_map<StringTrieNode*, int> m_record;
+    std::unordered_map<const StringTrieNode*, int> m_record;
 };
 
 

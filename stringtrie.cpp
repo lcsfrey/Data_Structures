@@ -193,7 +193,11 @@ void StringTrie::printAllWithPrefix(const std::string &prefix) const {
     printAllHelper(current_node, prefix);
 }
 
-void StringTrie::printAllByOccurences(int upper_limit, int lower_limit) const {
+void StringTrie::printAllByOccurences() const {
+    printOccurencesInRange();
+}
+
+void StringTrie::printOccurencesInRange(int upper_limit, int lower_limit) const {
     std::vector<std::pair<std::string, int>> pairs = m_record->getOrderedWords(this, upper_limit, lower_limit);
     std::cout << "Rank  | Frequency | String" << std::endl;
     int i = 1;
@@ -201,6 +205,58 @@ void StringTrie::printAllByOccurences(int upper_limit, int lower_limit) const {
         std::cout << std::setw(5)<< i++ << std::setw(2)
                   << "|" << std::setw(10) << pair.second << std::setw(2)
                   << "|" << pair.first << std::endl;
+    }
+}
+
+void StringTrie::writeToFile(std::string filename) const {
+    std::ofstream infile(filename);
+    if (!infile.is_open()) {
+        std::cout << "ERROR: " << filename << " could not be opened.\n";
+        return;
+    }
+    infile << head->m_paths.size() << " ";
+    for (const std::pair<char, StringTrieNode*> &pair : head->m_paths) {
+        writeToFileHelper(infile, pair.second);
+    }
+}
+
+void StringTrie::writeToFileHelper(std::ofstream &outfile, const StringTrieNode *current_node) const {
+    outfile << current_node->data << " "
+           << (current_node->is_a_word ? m_record->getNumberOccurences(current_node) : 0) << " "
+           << current_node->m_paths.size() << " ";
+    for (const std::pair<char, StringTrieNode*> &pair : current_node->m_paths) {
+        writeToFileHelper(outfile, pair.second);
+    }
+}
+
+void StringTrie::readFromFile(std::string filename) {
+    std::ifstream infile(filename);
+    if (!infile.is_open()) {
+        std::cout << "ERROR: " << filename << " could not be opened.\n";
+        return;
+    }
+    int current_size = 0;
+    infile >> current_size;
+    for (int i = 0; i < current_size; i++) {
+        readFromFileHelper(infile, head);
+    }
+}
+
+void StringTrie::readFromFileHelper(std::ifstream &infile, StringTrieNode *current_node) const {
+    char current_char;
+    int current_frequency;
+    int current_size;
+    infile >> current_char >> current_frequency >> current_size;
+    if (current_node->m_paths.find(current_char) == current_node->m_paths.end()) {
+        current_node->m_paths[current_char] = new StringTrieNode(current_char);
+        current_node->m_paths[current_char]->parent = current_node;
+    }
+    if (current_frequency > 0) {
+        current_node->m_paths[current_char]->is_a_word = true;
+        m_record->addWord(current_node->m_paths[current_char], current_frequency);
+    }
+    for (int i = 0; i < current_size; i++) {
+        readFromFileHelper(infile, current_node->m_paths[current_char]);
     }
 }
 
@@ -322,16 +378,16 @@ int StringTrie::getLengthOfLongestWord() const {
 }
 
 
-void StringRecord::addWord(StringTrieNode *current_node) {
+void StringRecord::addWord(const StringTrieNode *current_node, int occurences) {
     auto it = m_record.find(current_node);
     if (it == m_record.end()) {
-        m_record[current_node] = 1;
+        m_record[current_node] = occurences;
     } else {
-        it->second += 1;
+        it->second += occurences;
     }
 }
 
-int StringRecord::getNumberOccurences(StringTrieNode *word_node) const {
+int StringRecord::getNumberOccurences(const StringTrieNode *word_node) const {
     return m_record.at(word_node);
 }
 
@@ -344,7 +400,7 @@ std::vector<std::pair<std::string, int>> StringRecord::getOrderedWords(const Str
     std::string word = "";
 
     // add pair to vector if seen more than 40 times
-    for (const std::pair<StringTrieNode*, int> &pair : m_record) {
+    for (const std::pair<const StringTrieNode*, int> &pair : m_record) {
         if (pair.second < lower_limit || pair.second > upper_limit) continue;
 
         word = trie->buildStringFromFinalNode(pair.first);
