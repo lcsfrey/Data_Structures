@@ -387,8 +387,9 @@ void StringRecord::addWord(const StringTrieNode *current_node, int occurences) {
     }
 }
 
-int StringRecord::getNumberOccurences(const StringTrieNode *word_node) const {
-    return m_record.at(word_node);
+int StringRecord::getNumberOccurences(const StringTrieNode *current_node) const {
+    auto it = m_record.find(current_node);
+    return it != m_record.end() ? it->second : 0;
 }
 
 

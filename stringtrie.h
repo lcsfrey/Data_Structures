@@ -96,10 +96,8 @@ class StringTrie {
     void printOccurencesInRange(int upper_limit = INT32_MAX, int lower_limit = 0) const;
 
     void writeToFile(std::string filename = "trieFile.txt") const;
-    void writeToFileHelper(std::ofstream &outfile, const StringTrieNode *current_node) const;
 
     void readFromFile(std::string filename = "trieFile.txt");
-    void readFromFileHelper(std::ifstream &infile, StringTrieNode *current_node) const;
 
     friend class StringRecord;
     friend class StringSequenceTrie;
@@ -129,6 +127,9 @@ class StringTrie {
     // helper function that deletes all nodes in subtrie
     void removeSubTrie(StringTrieNode* current);
 
+    void readFromFileHelper(std::ifstream &infile, StringTrieNode *current_node) const;
+
+    void writeToFileHelper(std::ofstream &outfile, const StringTrieNode *current_node) const;
 
     StringTrieNode* head;
     int number_of_total_words = 0;
