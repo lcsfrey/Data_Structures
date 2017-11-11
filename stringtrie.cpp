@@ -214,7 +214,9 @@ void StringTrie::writeToFile(std::string filename) const {
         std::cout << "ERROR: " << filename << " could not be opened.\n";
         return;
     }
-    infile << head->m_paths.size() << " ";
+    infile << head->m_paths.size() << " "
+           << this->number_of_unique_words << " "
+           << this->number_of_total_words << " ";
     for (const std::pair<char, StringTrieNode*> &pair : head->m_paths) {
         writeToFileHelper(infile, pair.second);
     }
@@ -236,7 +238,9 @@ void StringTrie::readFromFile(std::string filename) {
         return;
     }
     int current_size = 0;
-    infile >> current_size;
+    infile >> current_size
+           >> this->number_of_unique_words
+           >> this->number_of_total_words;
     for (int i = 0; i < current_size; i++) {
         readFromFileHelper(infile, head);
     }

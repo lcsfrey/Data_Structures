@@ -144,7 +144,7 @@ class StringRecord {
     // or increment value (occurences) if already in map
     void addWord(const StringTrieNode* current_node, int occurences = 1);
 
-    int getNumberOccurences(const StringTrieNode *word_node) const;
+    int getNumberOccurences(const StringTrieNode *current_node) const;
 
     // returns ordered list of occurences
     std::vector<int> getOrderedOccurences();
