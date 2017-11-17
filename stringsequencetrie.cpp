@@ -156,19 +156,37 @@ void StringSequenceTrie::printOrderedWords(const std::string sequence,
     if (sequence != "") {
         std::cout << "Showing sequences starting with \"" << sequence << "\"\n";
     }
-    std::cout << "Frequency | Sequence"  << std::endl
-              << "----------|-----------" << std::endl;
+    std::cout << "Rank  | Frequency | String" << std::endl
+              << "------|-----------|-------" << std::endl;
 
-    for (const StringSequenceTrieNode* node : sequences) {
-        if (node->m_times_seen >= frequency_lower_limit && node->m_times_seen <= frequency_upper_limit) {
-            std::cout << std::setw(9) << node->m_times_seen << " | " << buildSequenceFromFinalNode(node) << std::endl;
+    int i = 1;
+    for (const StringSequenceTrieNode* sequence : sequences) {
+        if (sequence->m_times_seen >= frequency_lower_limit && sequence->m_times_seen <= frequency_upper_limit) {
+            std::cout << std::setw(5) << i++ << std::setw(2)
+                      << "|" << std::setw(10) << sequence->m_times_seen << std::setw(2)
+                      << "|" << buildSequenceFromFinalNode(sequence) << std::endl;
         }
+    }
+}
+
+void StringSequenceTrie::printMostFrequentSequences(int limit) {
+    std::vector<StringSequenceTrieNode*> sequences = getOrderedWords();
+    std::cout << "Rank  | Frequency | String" << std::endl
+              << "------|-----------|-------" << std::endl;
+
+    int i = 1;
+    for (int i = 0; i < limit && i < sequences.size(); i++) {
+            std::cout << std::setw(5) << i++ << std::setw(2)
+                      << "|" << std::setw(10) << sequences[i]->m_times_seen << std::setw(2)
+                      << "|" << buildSequenceFromFinalNode(sequences[i]) << std::endl;
+        if (i >= limit) return;
     }
 }
 
 std::string StringSequenceTrie::buildSequenceFromFinalNode(const StringSequenceTrieNode *current) const {
     if (current != head) {
-        return buildSequenceFromFinalNode(current->m_parent) + m_trie->buildStringFromFinalNode(current->m_trie_word_node) + " ";
+        return buildSequenceFromFinalNode(current->m_parent)
+            + m_trie->buildStringFromFinalNode(current->m_trie_word_node) + " ";
     } else {
         return "";
     }

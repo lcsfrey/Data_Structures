@@ -85,23 +85,20 @@ class StringSequenceTrie : StringTrie {
                            int frequency_upper_limit = INT32_MAX,
                            int frequency_lower_limit = 0) const;
 
+    void printMostFrequentSequences(int limit = 1000);
+
     // returns a sequence of strings one string at a time from the last node;
     std::string buildSequenceFromFinalNode(const StringSequenceTrieNode* current) const;
 
     void writeToFile(std::string filename = "trieFile.txt") const;
-    void writeToFileHelper(std::ofstream &outfile,
-                           const StringSequenceTrieNode *current_node) const;
 
     void readFromFile(std::string filename = "trieFile.txt");
-    void readFromFileHelper(std::ifstream &infile,
-                            StringSequenceTrieNode *current_node);
 
     void loadTextFile(std::string file_name = "", int window_size = 5);
 
  protected:
     // returns a node pointing to the last node in the sequence
     StringSequenceTrieNode* getNode(const std::string &sequence) const;
-
 
     void addSequenceHelper(const std::string &sequence, StringSequenceTrieNode *current_node,
                            int starting_pos = 0);
@@ -114,6 +111,13 @@ class StringSequenceTrie : StringTrie {
                                int branching_factor = 5) const;
 
  private:
+
+    void readFromFileHelper(std::ifstream &infile,
+                            StringSequenceTrieNode *current_node);
+
+    void writeToFileHelper(std::ofstream &outfile,
+                           const StringSequenceTrieNode *current_node) const;
+
     // contains dictionary of words that have been used
     StringTrie* m_trie;
 
