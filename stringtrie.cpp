@@ -61,6 +61,7 @@ StringTrie::~StringTrie() {
 
 void StringTrie::resetTrie() {
     removeSubTrie(head);
+    delete m_record;
     head = new StringTrieNode('\0');
     m_record = new StringRecord();
     number_of_total_words = 0;
@@ -199,12 +200,24 @@ void StringTrie::printAllByOccurences() const {
 
 void StringTrie::printOccurencesInRange(int upper_limit, int lower_limit) const {
     std::vector<std::pair<std::string, int>> pairs = m_record->getOrderedWords(this, upper_limit, lower_limit);
-    std::cout << "Rank  | Frequency | String" << std::endl;
+    std::cout << "Rank  | Frequency | String" << std::endl
+              << "------|-----------|-------" << std::endl;
     int i = 1;
     for (std::pair<std::string, int> &pair : pairs) {
-        std::cout << std::setw(5)<< i++ << std::setw(2)
+        std::cout << std::setw(5) << i++ << std::setw(2)
                   << "|" << std::setw(10) << pair.second << std::setw(2)
                   << "|" << pair.first << std::endl;
+    }
+}
+
+void StringTrie::printTopOccurences(int limit) {
+    std::vector<std::pair<std::string, int>> pairs = m_record->getOrderedWords(this);
+    std::cout << "Rank  | Frequency | String" << std::endl
+              << "------|-----------|-------" << std::endl;
+    for (int i = 0; i < limit && i < (int)pairs.size(); i++) {
+      std::cout << std::setw(5) << i+1 << std::setw(2)
+                << "|" << std::setw(10) << pairs[i].second << std::setw(2)
+                << "|" << pairs[i].first << std::endl;
     }
 }
 
@@ -222,7 +235,8 @@ void StringTrie::writeToFile(std::string filename) const {
     }
 }
 
-void StringTrie::writeToFileHelper(std::ofstream &outfile, const StringTrieNode *current_node) const {
+void StringTrie::writeToFileHelper(std::ofstream &outfile,
+                                   const StringTrieNode *current_node) const {
     outfile << current_node->data << " "
            << (current_node->is_a_word ? m_record->getNumberOccurences(current_node) : 0) << " "
            << current_node->m_paths.size() << " ";
@@ -246,7 +260,8 @@ void StringTrie::readFromFile(std::string filename) {
     }
 }
 
-void StringTrie::readFromFileHelper(std::ifstream &infile, StringTrieNode *current_node) const {
+void StringTrie::readFromFileHelper(std::ifstream &infile,
+                                    StringTrieNode *current_node) const {
     char current_char;
     int current_frequency;
     int current_size;
@@ -336,7 +351,8 @@ std::string StringTrie::buildStringFromFinalNode(const StringTrieNode* current_n
   }
 }
 
-
+// returns a pointer to the StringTrieNode corresponding with the last character
+// of the string word. If word is not in the trie, a nullptr is returned
 StringTrieNode *StringTrie::getNode(const std::string &word) {
   std::map<char, StringTrieNode*>* current_map = &head->m_paths;
   StringTrieNode* current_node = head;
@@ -407,7 +423,6 @@ std::vector<std::pair<std::string, int>> StringRecord::getOrderedWords(const Str
     // add pair to vector if seen more than 40 times
     for (const std::pair<const StringTrieNode*, int> &pair : m_record) {
         if (pair.second < lower_limit || pair.second > upper_limit) continue;
-
         word = trie->buildStringFromFinalNode(pair.first);
         word_occurences = pair.second;
         words.push_back(std::pair<std::string, int>(std::move(word), word_occurences));

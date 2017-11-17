@@ -89,11 +89,21 @@ class StringTrie {
     int getLengthOfShortestWord() const;
     int getLengthOfLongestWord() const;
 
-
     void printAll() const;
     void printAllWithPrefix(const std::string &prefix) const;
+
+    // prints all strings in trie ordered by the number of times that string has
+    // been added to the trie
     void printAllByOccurences() const;
+
+    // prints strings in trie ordered by the number of times that string has been
+    // added to the trie. Only prints strings that have with a frequency less
+    // than or equal to upper_limit and greater than or equal to lower_limit
     void printOccurencesInRange(int upper_limit = INT32_MAX, int lower_limit = 0) const;
+
+    // prints the most common words in the trie. Only prints a number of strings
+    // equal to limit
+    void printTopOccurences(int limit = 1000);
 
     void writeToFile(std::string filename = "trieFile.txt") const;
 
@@ -113,7 +123,6 @@ class StringTrie {
     // corresponding to the last node (character) of the string
     // returns nullptr if word is not in trie
     StringTrieNode* getNode(const std::string &word);
-
 
  private:
     // prints all words in subtree,
