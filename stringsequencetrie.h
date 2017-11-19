@@ -27,6 +27,9 @@
 #ifndef STRINGSEQUENCETRIE_H
 #define STRINGSEQUENCETRIE_H
 
+#include <unordered_map>
+#include <vector>
+
 #include "stringtrie.h"
 
 class StringSequenceTrieNode {
@@ -54,7 +57,7 @@ class StringSequenceTrieNode {
     int m_times_seen;
 };
 
-class StringSequenceTrie {
+class StringSequenceTrie : StringTrie {
  public:
     StringSequenceTrie();
 
@@ -82,8 +85,14 @@ class StringSequenceTrie {
                            int frequency_upper_limit = INT32_MAX,
                            int frequency_lower_limit = 0) const;
 
+    void printMostFrequentSequences(int limit = 1000);
+
     // returns a sequence of strings one string at a time from the last node;
-    std::string buildSequenceFromFinalNode(const StringSequenceTrieNode *current) const;
+    std::string buildSequenceFromFinalNode(const StringSequenceTrieNode* current) const;
+
+    void writeToFile(std::string filename = "trieFile.txt") const;
+
+    void readFromFile(std::string filename = "trieFile.txt");
 
     void loadTextFile(std::string file_name = "", int window_size = 5);
 
@@ -91,10 +100,8 @@ class StringSequenceTrie {
     // returns a node pointing to the last node in the sequence
     StringSequenceTrieNode* getNode(const std::string &sequence) const;
 
-
     void addSequenceHelper(const std::string &sequence, StringSequenceTrieNode *current_node,
                            int starting_pos = 0);
-
 
     void getOrderedWordsHelper(const StringSequenceTrieNode* current_node,
                                std::vector<StringSequenceTrieNode *> &sequences,
@@ -104,6 +111,13 @@ class StringSequenceTrie {
                                int branching_factor = 5) const;
 
  private:
+
+    void readFromFileHelper(std::ifstream &infile,
+                            StringSequenceTrieNode *current_node);
+
+    void writeToFileHelper(std::ofstream &outfile,
+                           const StringSequenceTrieNode *current_node) const;
+
     // contains dictionary of words that have been used
     StringTrie* m_trie;
 
