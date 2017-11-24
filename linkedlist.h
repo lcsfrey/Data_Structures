@@ -27,7 +27,7 @@
 #ifndef LINKEDLIST_H_
 #define LINKEDLIST_H_
 
-#include<iostream>
+#include <iostream>
 
 ///////////////////////////////////////////////////////////////////////////////
 // DECLARATIONS
@@ -35,62 +35,62 @@
 
 template<class T>
 struct ListNode {
-    T data;
-    ListNode<T>* next;
-    ListNode<T>* prev;
-    // creates empty list node
-    ListNode();
-    // creates list node containing value
-    explicit ListNode(const T& value);
+  T data;
+  ListNode<T>* next;
+  ListNode<T>* prev;
+  // creates empty list node
+  ListNode();
+  // creates list node containing value
+  explicit ListNode(const T& value);
 };
 
 template<class T>
 class LinkedList {
  public:
-    // default constructor
-    LinkedList();
-    // copy constructor
-    explicit LinkedList(const LinkedList& other_list);
-    // destructor
-    ~LinkedList();
-    // assignment operator
-    LinkedList& operator=(const LinkedList& other_list);
+  // default constructor
+  LinkedList();
+  // copy constructor
+  explicit LinkedList(const LinkedList& other_list);
+  // destructor
+  ~LinkedList();
+  // assignment operator
+  LinkedList& operator=(const LinkedList& other_list);
 
-    // insert value at start of list
-    void insertStart(const T& value);
-    // insert value at end of list
-    void insertEnd(const T& value);
-    // insert value at specified index
-    void insertAt(const T& value, const int index);
+  // insert value at start of list
+  void insertStart(const T& value);
+  // insert value at end of list
+  void insertEnd(const T& value);
+  // insert value at specified index
+  void insertAt(const T& value, const int index);
 
-    // returns true if value is in list
-    bool contains(const T& value) const;
+  // returns true if value is in list
+  bool contains(const T& value) const;
 
-    // returns first element in the list
-    inline T getFirst() const;
-    // returns last element in the list
-    inline T getLast() const;
-    // returns element at specified index
-    T getItemAt(const int index) const;
+  // returns first element in the list
+  inline T getFirst() const;
+  // returns last element in the list
+  inline T getLast() const;
+  // returns element at specified index
+  T getItemAt(const int index) const;
 
-    // removes first element from the list
-    T removeFirst();
-    // removes last element from the list
-    T removeLast();
-    // removes element at specified index
-    T removeAt(const int index);
+  // removes first element from the list
+  T removeFirst();
+  // removes last element from the list
+  T removeLast();
+  // removes element at specified index
+  T removeAt(const int index);
 
-    //returns number of elements in list
-    inline int getLength() const;
+  //returns number of elements in list
+  inline int getLength() const;
 
-    // prints list in order in the form,
-    // "Head -> data -> data -> data...."
-    void print() const;
+  // prints list in order in the form,
+  // "Head -> data -> data -> data...."
+  void print() const;
 
  private:
-        ListNode<T>* head;
-        ListNode<T>* tail;
-        int length;
+  ListNode<T>* head;
+  ListNode<T>* tail;
+  int length;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -99,80 +99,80 @@ class LinkedList {
 // initializes empty ListNode
 template<class T>
 ListNode<T>::ListNode() {
-    next = nullptr;
-    prev = nullptr;
+  next = nullptr;
+  prev = nullptr;
 }
 
 // initializes ListNode
 template<class T>
 ListNode<T>::ListNode(const T& value) {
-    data = value;
-    next = nullptr;
-    prev = nullptr;
+  data = value;
+  next = nullptr;
+  prev = nullptr;
 }
 
 // initializes empty LinkedList
 template<class T>
 LinkedList<T>::LinkedList() {
-    head = new ListNode<T>();
-    tail = new ListNode<T>();
-    length = 0;
-    head->next = tail;
-    tail->prev = head;
+  head = new ListNode<T>();
+  tail = new ListNode<T>();
+  length = 0;
+  head->next = tail;
+  tail->prev = head;
 }
 
 // copy constructor
 // initializes new LinkedList as a deep copy of existing LinkedList
 template<class T>
 LinkedList<T>::LinkedList(const LinkedList& other_list) {
-    ListNode<T>* other_node = other_list.head->next;
-    ListNode<T>* current = head;
-    head = new ListNode<T>();
-    tail = new ListNode<T>();
+  ListNode<T>* other_node = other_list.head->next;
+  ListNode<T>* current = head;
+  head = new ListNode<T>();
+  tail = new ListNode<T>();
+  current = current->next;
+  while (other_node != other_list.tail) {
+    current->next = new ListNode<T>(other_node->data);
+    current->next->prev = current;
     current = current->next;
-    while (other_node != other_list.tail) {
-        current->next = new ListNode<T>(other_node->data);
-        current->next->prev = current;
-        current = current->next;
-        other_node = other_node->next;
-    }
-    current->next = tail;
-    tail->prev = current;
-    other_list.length;
+    other_node = other_node->next;
+  }
+  current->next = tail;
+  tail->prev = current;
+  other_list.length;
 }
 
 // releases memory allocated by LinkedList
 template<class T>
 LinkedList<T>::~LinkedList() {
-    ListNode<T>* current = head->next;
-    while (current != tail) {
-        delete current->prev;
-        current = current->next;
-    }
+  ListNode<T>* current = head->next;
+  while (current != tail) {
     delete current->prev;
-    delete current;
+    current = current->next;
+  }
+  delete current->prev;
+  delete current;
 }
 
 // insert item at start of list
 template<class T>
 void LinkedList<T>::insertStart(const T &value) {
-    ListNode<T>* temp = new ListNode<T>(value);
-    temp->next = head->next;
-    temp->next->prev = temp;
-    temp->prev = head;
-    head->next = temp;
-    length++;
+  ListNode<T>* temp = new ListNode<T>(value);
+  temp->next = head->next;
+  temp->next->prev = temp;
+  temp->prev = head;
+  head->next = temp;
+  length++;
 }
 
 // insert item at end of list
 template<class T>
 void LinkedList<T>::insertEnd(const T &value) {
-    ListNode<T>* temp = new ListNode<T>(value);
-    temp->prev = tail->prev;
-    temp->next = tail;
-    tail->prev->next = temp;
-    tail->prev = temp;
-    length++;
+  ListNode<T>* temp = new ListNode<T>(value);
+  temp->prev = tail->prev;
+  temp->next = tail;
+  tail->prev->next = temp;
+  tail->prev = temp;
+  length++;
 }
 
 // insert at certain length into list
@@ -180,135 +180,135 @@ void LinkedList<T>::insertEnd(const T &value) {
 // adds to end if index is greater than length of list
 template<class T>
 void LinkedList<T>::insertAt(const T &value, const int index) {
-    if (index >= length) {
-        insertEnd(value);
-    } else if (index == 0) {
-        insertStart(value);
-    } else {
-        int temp_position = 0;
-        ListNode<T>* current = head;
-        ListNode<T>* temp = new ListNode<T>(value);
-        while (temp_position < index) {
-            current = current->next;
-            temp_position++;
-        }
-        temp->prev = current;
-        temp->next = current->next;
-        current->next->prev = temp;
-        current->next = temp;
-        length++;
+  if (index >= length) {
+    insertEnd(value);
+  } else if (index == 0) {
+    insertStart(value);
+  } else {
+    int temp_position = 0;
+    ListNode<T>* current = head;
+    ListNode<T>* temp = new ListNode<T>(value);
+    while (temp_position < index) {
+      current = current->next;
+      temp_position++;
     }
+    temp->prev = current;
+    temp->next = current->next;
+    current->next->prev = temp;
+    current->next = temp;
+    length++;
+  }
 }
 
 // removes first item from array
 // returns copy of item that was deleted
 template<class T>
 T LinkedList<T>::removeFirst() {
-    T temp_data = head->next->data;
-    if (length > 0) {
-        ListNode<T>* to_delete = head->next;
-        head->next = head->next->next;
-        head->next->prev = head;
-        delete to_delete;
-        length--;
-    }
-    return temp_data;
+  T temp_data = head->next->data;
+  if (length > 0) {
+    ListNode<T>* to_delete = head->next;
+    head->next = head->next->next;
+    head->next->prev = head;
+    delete to_delete;
+    length--;
+  }
+  return temp_data;
 }
 
 // removes last item from array
 // returns copy of item that was deleted
 template<class T>
 T LinkedList<T>::removeLast() {
-    T temp_data = tail->prev->data;
-    if (length > 0) {
-        ListNode<T>* to_delete = tail->prev;
-        tail->prev = to_delete->prev;
-        to_delete->prev->next = tail;
-        delete to_delete;
-        length--;
-    }
-    return temp_data;
+  T temp_data = tail->prev->data;
+  if (length > 0) {
+    ListNode<T>* to_delete = tail->prev;
+    tail->prev = to_delete->prev;
+    to_delete->prev->next = tail;
+    delete to_delete;
+    length--;
+  }
+  return temp_data;
 }
 
 // remove element at index
 // removes the last element if the index is greater than the length of the list
 template<class T>
 T LinkedList<T>::removeAt(const int index) {
-    if (index >= length) {
-        return removeLast();
-    } else if (index == 0) {
-        return removeFirst();
-    } else {
-        int temp_position = 0;
-        ListNode<T>* to_delete = head->next;
-        while (temp_position < index) {
-            to_delete = to_delete->next;
-            temp_position++;
-        }
-        to_delete->prev->next = to_delete->next;
-        to_delete->next->prev = to_delete->prev;
-        T data(to_delete->data);
-        delete to_delete;
-        length--;
-        return data;
+  if (index >= length) {
+    return removeLast();
+  } else if (index == 0) {
+    return removeFirst();
+  } else {
+    int temp_position = 0;
+    ListNode<T>* to_delete = head->next;
+    while (temp_position < index) {
+      to_delete = to_delete->next;
+      temp_position++;
     }
+    to_delete->prev->next = to_delete->next;
+    to_delete->next->prev = to_delete->prev;
+    T data(to_delete->data);
+    delete to_delete;
+    length--;
+    return data;
+  }
 }
 
 template<class T>
 bool LinkedList<T>::contains(const T &value) const {
-    ListNode<T>* current = head->next;
-    while (current != tail) {
-        if (current->data == value) {
-            return true;
-        }
-        current = current->next;
+  ListNode<T>* current = head->next;
+  while (current != tail) {
+    if (current->data == value) {
+      return true;
     }
-    return false;
+    current = current->next;
+  }
+  return false;
 }
 
 template<class T>
 T LinkedList<T>::getFirst() const {
-    return head->next->data;
+  return head->next->data;
 }
 
 template<class T>
 T LinkedList<T>::getLast() const {
-    return tail->prev->data;
+  return tail->prev->data;
 }
 
 template<class T>
 T LinkedList<T>::getItemAt(const int index) const {
-    if (index >= length) {
-        return tail->prev->data;
-    } else if (index == 0) {
-        return head->next->data;
-    } else {
-        int temp_position = 0;
-        ListNode<T>* current = head->next;
-        while (temp_position < index) {
-            current = current->next;
-            temp_position++;
-        }
-        return current->data;
+  if (index >= length) {
+    return tail->prev->data;
+  } else if (index == 0) {
+    return head->next->data;
+  } else {
+    int temp_position = 0;
+    ListNode<T>* current = head->next;
+    while (temp_position < index) {
+      current = current->next;
+      temp_position++;
     }
+    return current->data;
+  }
 }
 
 template<class T>
 int LinkedList<T>::getLength() const {
-    return length;
+  return length;
 }
 
 // prints list in order in the form,
 // "Head -> data -> data -> data...."
 template<class T>
 void LinkedList<T>::print() const {
-    ListNode<T>* current = head->next;
-    std::cout << "Head -> ";
-    while (current != tail->prev) {
-        std::cout << current->data << " -> ";
-        current = current->next;
-    }
-    std::cout << current->data << std::endl;
+  ListNode<T>* current = head->next;
+  std::cout << "Head -> ";
+  while (current != tail->prev) {
+    std::cout << current->data << " -> ";
+    current = current->next;
+  }
+  std::cout << current->data << std::endl;
 }
 
 #endif  // LINKEDLIST_H_

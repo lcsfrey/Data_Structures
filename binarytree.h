@@ -35,76 +35,76 @@
 
 template<class T>
 struct TreeNode {
-    T data;
-    TreeNode<T>* left;
-    TreeNode<T>* right;
-    TreeNode<T>* parent;
-    // creates empty tree node
-    TreeNode();
-    // creates tree node containing value
-    TreeNode<T>(const T& value, TreeNode<T>* temp_parent = nullptr);
+  T data;
+  TreeNode<T>* left;
+  TreeNode<T>* right;
+  TreeNode<T>* parent;
+  // creates empty tree node
+  TreeNode();
+  // creates tree node containing value
+  TreeNode<T>(const T& value, TreeNode<T>* temp_parent = nullptr);
 };
 
 template<class T>
 class BinaryTree {
  public:
-    // default constructor
-    BinaryTree();
-    // copy constructor
-    explicit BinaryTree(const BinaryTree &other_tree);
-    // destructor that calls removeSubTree on both child nodes
-    // and then deletes the root node
-    ~BinaryTree();
+  // default constructor
+  BinaryTree();
+  // copy constructor
+  explicit BinaryTree(const BinaryTree &other_tree);
+  // destructor that calls removeSubTree on both child nodes
+  // and then deletes the root node
+  ~BinaryTree();
 
-    // insert value into tree
-    void insert(const T& value);
+  // insert value into tree
+  void insert(const T& value);
 
-    // returns true if value is in the tree
-    bool contains(const T& value) const;
+  // returns true if value is in the tree
+  bool contains(const T& value) const;
 
-    // returns largest element in tree
-    inline T getLargest() const;
+  // returns largest element in tree
+  inline T getLargest() const;
 
-    // returns smallest element in tree
-    inline T getSmallest() const;
+  // returns smallest element in tree
+  inline T getSmallest() const;
 
-    // removes value from tree
-    void remove(const T& value);
-    // removes largest element from tree
-    void removeLargest();
-    // removes smallest element from tree
-    void removeSmallest();
+  // removes value from tree
+  void remove(const T& value);
+  // removes largest element from tree
+  void removeLargest();
+  // removes smallest element from tree
+  void removeSmallest();
 
-    // prints all elements in tree
-    void printAll() const;
+  // prints all elements in tree
+  void printAll() const;
 
  private:
-    // pointer to root of tree
-    TreeNode<T>* root;
+  // pointer to root of tree
+  TreeNode<T>* root;
 
-    // helper function that deletes all child nodes of current
-    // and then deletes current
-    void removeSubTree(TreeNode<T>* current);
+  // helper function that deletes all child nodes of current
+  // and then deletes current
+  void removeSubTree(TreeNode<T>* current);
 
-    // helper function that does inorder print of current node
-    // and all decendents nodes
-    inline void print(TreeNode<T>* current) const;
+  // helper function that does inorder print of current node
+  // and all decendents nodes
+  inline void print(TreeNode<T>* current) const;
 
-    // helper function that returns largest element in tree
-    // rooted at current
-    T getLargest(TreeNode<T>* current) const;
+  // helper function that returns largest element in tree
+  // rooted at current
+  T getLargest(TreeNode<T>* current) const;
 
-    // helper function that returns smallest element in tree
-    // rooted at current
-    T getSmallest(TreeNode<T>* current) const;
+  // helper function that returns smallest element in tree
+  // rooted at current
+  T getSmallest(TreeNode<T>* current) const;
 
-    // helper function that removes largest element in tree
-    // rooted at current
-    void removeLargest(TreeNode<T>* current);
+  // helper function that removes largest element in tree
+  // rooted at current
+  void removeLargest(TreeNode<T>* current);
 
-    // helper function that removes smallest element in tree
-    // rooted at current
-    void removeSmallest(TreeNode<T> *current);
+  // helper function that removes smallest element in tree
+  // rooted at current
+  void removeSmallest(TreeNode<T> *current);
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -113,210 +113,204 @@ class BinaryTree {
 
 template<class T>
 TreeNode<T>::TreeNode() {
-    left = nullptr;
-    right = nullptr;
-    parent = nullptr;
+  left = nullptr;
+  right = nullptr;
+  parent = nullptr;
 }
 
 template<class T>
 TreeNode<T>::TreeNode(const T& value, TreeNode<T>* temp_parent) {
-    data = value;
-    left = nullptr;
-    right = nullptr;
-    parent = temp_parent;
+  data = value;
+  left = nullptr;
+  right = nullptr;
+  parent = temp_parent;
 }
 
 template<class T>
 BinaryTree<T>::BinaryTree() {
-    root = nullptr;
+  root = nullptr;
 }
 
 template<class T>
 BinaryTree<T>::~BinaryTree() {
-    removeSubTree(root->left);
-    removeSubTree(root->right);
-    delete root;
+  removeSubTree(root->left);
+  removeSubTree(root->right);
+  delete root;
 }
 
 template<class T>
 BinaryTree<T>::BinaryTree(const BinaryTree<T> &other_tree) {
-    TreeNode<T> other_node = other_tree.root;
-    root = new TreeNode<T>(other_node.data);
+  TreeNode<T> other_node = other_tree.root;
+  root = new TreeNode<T>(other_node.data);
 }
 
 // insert node with value into the tree if it does not already exist
 template<class T>
 void BinaryTree<T>::insert(const T& value) {
-    if (root == nullptr) {
-        root = new TreeNode<T>(value, nullptr);
-    }
-    TreeNode<T>* parent = root;
-    TreeNode<T>* current = root;
-    while (current != nullptr) {
-        parent = current;
-        if (current->data == value) {
-            return;
-        } else if (current->data > value) {
-            current = current->left;
-        } else {
-            current = current->right;
-        }
-    }
-    if (parent->data > value) {
-        parent->left = new TreeNode<T>(value, parent);
-    } else {
-        parent->right = new TreeNode<T>(value, parent);
-    }
+  if (root == nullptr)
+    root = new TreeNode<T>(value, nullptr);
+  TreeNode<T>* parent = root;
+  TreeNode<T>* current = root;
+
+  while (current != nullptr) {
+    parent = current;
+    if (current->data == value)
+      return;
+    else if (current->data > value)
+      current = current->left;
+    else
+      current = current->right;
+  }
+
+  if (parent->data > value)
+    parent->left = new TreeNode<T>(value, parent);
+  else
+    parent->right = new TreeNode<T>(value, parent);
 }
 
 // Removes value from tree if it exists
 // Replaces value of that node with the largest element on the left of the right
 template<class T>
 void BinaryTree<T>::remove(const T &value) {
-    if (root == nullptr) {
-        return;
+  if (root == nullptr)
+    return;
+
+  TreeNode<T>* current = root;
+  while (current != nullptr) {
+    if (current->data == value)
+      break;
+    else if (current->data > value)
+      current = current->left;
+    else
+      current = current->right;
+  }
+
+  if (current != nullptr) {
+    if (current->left !=nullptr) {
+      T largest_on_left = getLargest(current->left);
+      removeLargest(current->left);
+      current->data = largest_on_left;
+    } else if (current->right != nullptr) {
+      T smallest_on_right = getSmallest(current->right);
+      removeSmallest(current->right);
+      current->data = smallest_on_right;
+    } else {
+      if (current == root) {
+        delete root;
+        root = nullptr;
+      } else if (current == current->parent->left) {
+        current->parent->left = nullptr;
+        delete current;
+      } else {
+        current->parent->right = nullptr;
+        delete current;
+      }
     }
-    TreeNode<T>* current = root;
-    while (current != nullptr) {
-        if (current->data == value) {
-            break;
-        } else if (current->data > value) {
-            current = current->left;
-        } else {
-            current = current->right;
-        }
-    }
-    if (current != nullptr) {
-        if (current->left !=nullptr) {
-            T largest_on_left = getLargest(current->left);
-            removeLargest(current->left);
-            current->data = largest_on_left;
-        } else if (current->right != nullptr) {
-            T smallest_on_right = getSmallest(current->right);
-            removeSmallest(current->right);
-            current->data = smallest_on_right;
-        } else {
-            if (current == root) {
-                delete root;
-                root = nullptr;
-            } else if (current == current->parent->left) {
-                current->parent->left = nullptr;
-                delete current;
-            } else {
-                current->parent->right = nullptr;
-                delete current;
-            }
-        }
-    }
+  }
 }
 
 template<class T>
 T BinaryTree<T>::getLargest() const {
-    return getLargest(root);
+  return getLargest(root);
 }
 
 template<class T>
 T BinaryTree<T>::getLargest(TreeNode<T>* current) const {
-    if (current->right != nullptr) {
-        return getLargest(current->right);
-    } else {
-        return current->data;
-    }
+  if (current->right != nullptr)
+    return getLargest(current->right);
+  else
+    return current->data;
 }
 
 template<class T>
 T BinaryTree<T>::getSmallest() const {
-    return getSmallest(root);
+  return getSmallest(root);
 }
+
 template<class T>
 T BinaryTree<T>::getSmallest(TreeNode<T>* current) const {
-    if (current->left != nullptr) {
-        return getSmallest(current->left);
-    } else {
-        return current->data;
-    }
+  if (current->left != nullptr)
+    return getSmallest(current->left);
+  else
+    return current->data;
 }
 
 template<class T>
 void BinaryTree<T>::removeLargest() {
-    if (root == nullptr) {
-        return;
-    }
-    removeLargest(root);
+  if (root == nullptr)
+    return;
+  removeLargest(root);
 }
 
 template<class T>
 void BinaryTree<T>::removeLargest(TreeNode<T>* current) {
-    if (root->right == nullptr) {
-        current = root->left;
-        delete root;
-        root = current;
-        return;
-    }
-    while (current->right != nullptr) {
-        current = current->right;
-    }
-    current->parent->right = nullptr;
-    delete current;
+  if (root->right == nullptr) {
+    current = root->left;
+    delete root;
+    root = current;
+    return;
+  }
+  while (current->right != nullptr) {
+    current = current->right;
+  }
+  current->parent->right = nullptr;
+  delete current;
 }
 
 template<class T>
 void BinaryTree<T>::removeSmallest() {
-    if (root == nullptr) {
-        return;
-    }
-    removeSmallest(root);
+  if (root == nullptr)
+    return;
+  removeSmallest(root);
 }
 
 template<class T>
 void BinaryTree<T>::removeSmallest(TreeNode<T> *current) {
-    if (root->left == nullptr) {
-        current = root->right;
-        delete root;
-        root = current;
-        return;
-    }
-    while (current->left != nullptr) {
-        current = current->left;
-    }
-    current->parent->left = nullptr;
-    delete current;
+  if (root->left == nullptr) {
+    current = root->right;
+    delete root;
+    root = current;
+    return;
+  }
+  while (current->left != nullptr) {
+    current = current->left;
+  }
+  current->parent->left = nullptr;
+  delete current;
 }
 
 // input: value to search for
 // output: returns true if tree contains value
 template<class T>
 bool BinaryTree<T>::contains(const T &value) const {
-    if (root == nullptr) {
-        return false;
-    }
-    TreeNode<T>* current = root;
-    while (current != nullptr) {
-        if (current->data == value) {
-            return true;
-        } else if (current->data > value) {
-            current = current->left;
-        } else {
-            current = current->right;
-        }
-    }
+  if (root == nullptr)
     return false;
-}
 
-template<class T>
-void BinaryTree<T>::printAll() const {
-    print(root);
-    std::cout << std::endl;
+  TreeNode<T>* current = root;
+  while (current != nullptr) {
+    if (current->data == value)
+      return true;
+    else if (current->data > value)
+      current = current->left;
+    else
+      current = current->right;
+  }
+  return false;
 }
 
 template<class T>
 void BinaryTree<T>::removeSubTree(TreeNode<T> *current) {
-    if (current == nullptr) {
-        return;
-    }
-    removeSubTree(current->left);
-    removeSubTree(current->right);
-    delete current;
+  if (current == nullptr)
+    return;
+  removeSubTree(current->left);
+  removeSubTree(current->right);
+  delete current;
+}
+
+template<class T>
+void BinaryTree<T>::printAll() const {
+  print(root);
+  std::cout << std::endl;
 }
 
 // prints current's left descendents
@@ -325,12 +319,11 @@ void BinaryTree<T>::removeSubTree(TreeNode<T> *current) {
 
 template<class T>
 void BinaryTree<T>::print(TreeNode<T> *current) const {
-    if (current == nullptr) {
-        return;
-    }
-    print(current->left);
-    std::cout << current->data << " ";
-    print(current->right);
+  if (current == nullptr)
+    return;
+  print(current->left);
+  std::cout << current->data << " ";
+  print(current->right);
 }
 
 #endif  // BINARYTREE_H_
