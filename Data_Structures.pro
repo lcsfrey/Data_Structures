@@ -4,11 +4,13 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-    binarytree.cpp \
-    wordtrie.cpp
+    stringsequencetrie.cpp \
+    stringtrie.cpp
 
 HEADERS += \
-    LinkedList.h \
-    StringTrie.h \
     binarytree.h \
-    wordtrie.h
+    stringsequencetrie.h \
+    stringtrie.h \
+    binaryheap.h \
+    linkedlist.h \
+    skiplist.h

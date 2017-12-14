@@ -35,67 +35,67 @@
 
 template<class T>
 struct SkipListNode {
-    T data;
-    std::vector<SkipListNode<T>*> next;
-    std::vector<SkipListNode<T>*> prev;
-    // creates empty list node
-    SkipListNode();
-    // creates list node containing value
-    explicit SkipListNode(const T& value);
+  T data;
+  std::vector<SkipListNode<T>*> next;
+  std::vector<SkipListNode<T>*> prev;
+  // creates empty list node
+  SkipListNode();
+  // creates list node containing value
+  explicit SkipListNode(const T& value);
 };
 
 template<class T, class CompareFunc = std::less<T>>
 class SkipList {
  public:
-    // default constructor
-    SkipList();
-    // copy constructor
-    explicit SkipList(const SkipList& other_list);
-    // destructor
-    ~SkipList();
-    // assignment operator
-    SkipList& operator=(const SkipList& other_list);
+  // default constructor
+  SkipList();
+  // copy constructor
+  explicit SkipList(const SkipList& other_list);
+  // destructor
+  ~SkipList();
+  // assignment operator
+  SkipList& operator=(const SkipList& other_list);
 
-    // insert value into list
-    void insert(const T& value);
+  // insert value into list
+  void insert(const T& value);
 
-    // remove value from list
-    void remove(const T& value);
+  // remove value from list
+  void remove(const T& value);
 
-    // returns true if value is in the list
-    bool contains(const T& value) const;
+  // returns true if value is in the list
+  bool contains(const T& value) const;
 
-    // returns first element in the list
-    T getFirst() const;
-    // returns last element in the list
-    T getLast() const;
+  // returns first element in the list
+  T getFirst() const;
+  // returns last element in the list
+  T getLast() const;
 
-    // returns number of elements in the list
-    inline int getLength() const;
+  // returns number of elements in the list
+  inline int getLength() const;
 
-    // returns true if list is empty
-    inline bool isEmpty() const;
+  // returns true if list is empty
+  inline bool isEmpty() const;
 
-    // prints list in order in the form,
-    // "Head -> data -> data -> data.... -> Tail"
-    void print() const;
+  // prints list in order in the form,
+  // "Head -> data -> data -> data.... -> Tail"
+  void print() const;
 
  private:
-    // finds value in list and returns pointer to that node
-    // returns null pointer if value is not in list
-    SkipListNode<T>* findNode(const T& value) const;
+  // finds value in list and returns pointer to that node
+  // returns null pointer if value is not in list
+  SkipListNode<T>* findNode(const T& value) const;
 
-    // used by insert method to determine if new skip list layer
-    // should be created
-    std::default_random_engine m_generator;
-    std::bernoulli_distribution m_distribution;
+  // used by insert method to determine if new skip list layer
+  // should be created
+  std::default_random_engine m_generator;
+  std::bernoulli_distribution m_distribution;
 
-    // comparison functor used to define the order of the skip list
-    CompareFunc comp;
+  // comparison functor used to define the order of the skip list
+  CompareFunc comp;
 
-    SkipListNode<T>* head;
-    SkipListNode<T>* tail;
-    int length;
+  SkipListNode<T>* head;
+  SkipListNode<T>* tail;
+  int length;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,147 +104,147 @@ class SkipList {
 
 template<class T>
 SkipListNode<T>::SkipListNode() {
-    next.push_back(nullptr);
-    prev.push_back(nullptr);
+  next.push_back(nullptr);
+  prev.push_back(nullptr);
 }
 
 template<class T>
 SkipListNode<T>::SkipListNode(const T &value) {
-    data = value;
-    next.push_back(nullptr);
-    prev.push_back(nullptr);
+  data = value;
+  next.push_back(nullptr);
+  prev.push_back(nullptr);
 }
 
 template<class T, class CompareFunc>
 SkipList<T, CompareFunc>::SkipList() : m_distribution(.5) {
-    length = 0;
-    tail = new SkipListNode<T>();
-    head = new SkipListNode<T>();
-    head->next[0] = tail;
-    tail->prev[0] = head;
+  length = 0;
+  tail = new SkipListNode<T>();
+  head = new SkipListNode<T>();
+  head->next[0] = tail;
+  tail->prev[0] = head;
 }
 
 template<class T, class CompareFunc>
 SkipList<T, CompareFunc>::~SkipList() {
-    SkipListNode<T>* current = head;
-    SkipListNode<T>* next;
-    while (current != tail) {
-        next = current->next.front();
-        delete current;
-        current = next;
-    }
+  SkipListNode<T>* current = head;
+  SkipListNode<T>* next;
+  while (current != tail) {
+    next = current->next.front();
     delete current;
+    current = next;
+  }
+  delete current;
 }
 
 template<class T, class CompareFunc>
 void SkipList<T, CompareFunc>::insert(const T &value) {
-    int current_level = head->next.size() - 1;
-    std::vector<SkipListNode<T>*> jump_list(head->next.size());
-    SkipListNode<T>* current = head;
-    SkipListNode<T>* next = current->next.back();
-    while (current_level > 0) {
-        if (next != tail && comp(current->next[current_level]->data, value)) {
-            current = next;
-            next = next->next.at(current_level);
-        } else {
-            jump_list[current_level] = current;
-            current_level--;
-            next = current->next.at(current_level);
-        }
+  int current_level = head->next.size() - 1;
+  std::vector<SkipListNode<T>*> jump_list(head->next.size());
+  SkipListNode<T>* current = head;
+  SkipListNode<T>* next = current->next.back();
+  while (current_level > 0) {
+    if (next != tail && comp(current->next[current_level]->data, value)) {
+      current = next;
+      next = next->next.at(current_level);
+    } else {
+      jump_list[current_level] = current;
+      current_level--;
+      next = current->next.at(current_level);
     }
-    while (next != tail && comp(current->next[current_level]->data, value)) {
-        current = next;
-        next = next->next[0];
+  }
+  while (next != tail && comp(current->next[current_level]->data, value)) {
+    current = next;
+    next = next->next[0];
+  }
+  SkipListNode<T>* node_to_add = new SkipListNode<T>(value);
+  node_to_add->next[0] = next;
+  next->prev[0] = node_to_add;
+  node_to_add->prev[0] = current;
+  current->next[0] = node_to_add;
+
+  int size = jump_list.size();
+  int index = 1;
+  while (m_distribution(m_generator)) {
+    if (index < size) {
+      current = jump_list[index];
+      next = current->next[index];
+
+      node_to_add->next.push_back(next);
+      next->prev[index] = node_to_add;
+
+      node_to_add->prev.push_back(current);
+      current->next[index] = node_to_add;
+      index++;
+    } else {
+      head->next.push_back(node_to_add);
+      node_to_add->prev.push_back(head);
+      node_to_add->next.push_back(tail);
+      tail->prev.push_back(node_to_add);
     }
-    SkipListNode<T>* node_to_add = new SkipListNode<T>(value);
-    node_to_add->next[0] = next;
-    next->prev[0] = node_to_add;
-    node_to_add->prev[0] = current;
-    current->next[0] = node_to_add;
-
-    int size = jump_list.size();
-    int index = 1;
-    while (m_distribution(m_generator)) {
-        if (index < size) {
-            current = jump_list[index];
-            next = current->next[index];
-
-            node_to_add->next.push_back(next);
-            next->prev[index] = node_to_add;
-
-            node_to_add->prev.push_back(current);
-            current->next[index] = node_to_add;
-            index++;
-        } else {
-            head->next.push_back(node_to_add);
-            node_to_add->prev.push_back(head);
-            node_to_add->next.push_back(tail);
-            tail->prev.push_back(node_to_add);
-        }
-    }
-    length++;
+  }
+  length++;
 }
 
 template<class T, class CompareFunc>
 void SkipList<T, CompareFunc>::remove(const T &value) {
-    SkipListNode<T>* node_to_delete = findNode(value);
-    if (node_to_delete != nullptr) {
-        for (int i = node_to_delete->next.size() - 1; i >= 0; i--) {
-            node_to_delete->prev[i]->next[i] = node_to_delete->next[i];
-            node_to_delete->next[i]->prev[i] = node_to_delete->prev[i];
-        }
-        delete node_to_delete;
-        length--;
+  SkipListNode<T>* node_to_delete = findNode(value);
+  if (node_to_delete != nullptr) {
+    for (int i = node_to_delete->next.size() - 1; i >= 0; i--) {
+      node_to_delete->prev[i]->next[i] = node_to_delete->next[i];
+      node_to_delete->next[i]->prev[i] = node_to_delete->prev[i];
     }
+    delete node_to_delete;
+    length--;
+  }
 }
 
 template<class T, class CompareFunc>
 bool SkipList<T, CompareFunc>::contains(const T &value) const {
-    SkipListNode<T>* current = findNode(value);
-    if (current != nullptr) {
-        return true;
-    } else {
-        return false;
-    }
+  SkipListNode<T>* current = findNode(value);
+  if (current != nullptr) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 template<class T, class CompareFunc>
 int SkipList<T, CompareFunc>::getLength() const {
-    return length;
+  return length;
 }
 
 template<class T, class CompareFunc>
 bool SkipList<T, CompareFunc>::isEmpty() const {
-    return length == 0;
+  return length == 0;
 }
 
 template<class T, class CompareFunc>
 void SkipList<T, CompareFunc>::print() const {
-    SkipListNode<T>* current = head->next[0];
-    std::cout << "Head -> ";
-    while (current != tail->prev[0]) {
-        std::cout << current->data << " -> ";
-        current = current->next[0];
-    }
-    std::cout << current->data << " -> Tail" << std::endl;
+  SkipListNode<T>* current = head->next[0];
+  std::cout << "Head -> ";
+  while (current != tail->prev[0]) {
+    std::cout << current->data << " -> ";
+    current = current->next[0];
+  }
+  std::cout << current->data << " -> Tail" << std::endl;
 }
 
 template<class T, class CompareFunc>
 SkipListNode<T>* SkipList<T, CompareFunc>::findNode(const T &value) const {
-    int current_level = head->next.size() - 1;
-    SkipListNode<T>* current = head;
-    do {
-        if (current->data == value) {
-            return current;
-        } else if (current->next[current_level] != tail &&
-                   (comp(current->next[current_level]->data, value) ||
-                    current->next[current_level]->data == value)) {
-            current = current->next[current_level];
-        } else {
-            current_level--;
-        }
-    } while (current != tail && current_level >= 0);
-    return nullptr;
+  int current_level = head->next.size() - 1;
+  SkipListNode<T>* current = head;
+  do {
+    if (current->data == value) {
+      return current;
+    } else if (current->next[current_level] != tail &&
+               (comp(current->next[current_level]->data, value) ||
+                current->next[current_level]->data == value)) {
+      current = current->next[current_level];
+    } else {
+      current_level--;
+    }
+  } while (current != tail && current_level >= 0);
+  return nullptr;
 }
 
 #endif  // SKIPLIST_H_

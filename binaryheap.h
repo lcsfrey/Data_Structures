@@ -35,34 +35,34 @@
 template <class T, class CompareFunc = std::greater<T>>
 class BinaryHeap {
  public:
-    // default constructor
-    BinaryHeap();
-    // copy constructor
-    explicit BinaryHeap(const BinaryHeap& other);
-    // destructor
-    ~BinaryHeap();
-    // adds value to the heap
-    void push(T value);
-    // removes and returns element at the top of the heap
-    T pop();
-    // returns the element at the top of the heap
-    T top() const;
-    // returns number of elements in heap
-    int getSize() const;
-    // returns true if the current heap array is full
-    inline bool isFull() const;
-    // resizes and frees up unused capacity allocated for array
-    inline void shrinkToFit();
+  // default constructor
+  BinaryHeap();
+  // copy constructor
+  explicit BinaryHeap(const BinaryHeap& other);
+  // destructor
+  ~BinaryHeap();
+  // adds value to the heap
+  void push(T value);
+  // removes and returns element at the top of the heap
+  T pop();
+  // returns the element at the top of the heap
+  T top() const;
+  // returns number of elements in heap
+  int getSize() const;
+  // returns true if the current heap array is full
+  inline bool isFull() const;
+  // resizes and frees up unused capacity allocated for array
+  inline void shrinkToFit();
 
  private:
-    // grows the heap array
-    void grow();
-    // pointer to heap array of elements
-    T* data;
-    int capacity;
-    int size;
-    // comparison functor used to define the order of the heap
-    CompareFunc comp;
+  // grows the heap array
+  void grow();
+  // pointer to heap array of elements
+  T* data;
+  int capacity;
+  int size;
+  // comparison functor used to define the order of the heap
+  CompareFunc comp;
 };
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,115 +71,111 @@ class BinaryHeap {
 
 template<class T, class CompareFunc>
 BinaryHeap<T, CompareFunc>::BinaryHeap() {
-    capacity = 20;
-    size = 0;
-    data = new T[capacity];
+  capacity = 20;
+  size = 0;
+  data = new T[capacity];
 }
 
 template<class T, class CompareFunc>
 BinaryHeap<T, CompareFunc>::BinaryHeap(const BinaryHeap &other) {
-    capacity = other.capacity;
-    size = 0;
-    data = new T[capacity];
-    for (int i = 0; i < size; i++) {
-        push(other.data[i]);
-    }
+  capacity = other.capacity;
+  size = 0;
+  data = new T[capacity];
+  for (int i = 0; i < size; i++)
+    push(other.data[i]);
 }
 
 template<class T, class CompareFunc>
 BinaryHeap<T, CompareFunc>::~BinaryHeap() {
-    delete data;
+  delete data;
 }
 
 template<class T, class CompareFunc>
 void BinaryHeap<T, CompareFunc>::push(T value) {
-    if (isFull()) {
-        grow();
-    }
-    int parent = size;
-    data[size++] = value;
+  if (isFull())
+    grow();
+  int parent = size;
+  data[size++] = value;
 
-    while (parent != 0 && comp(data[(parent - 1)/2], data[parent])) {
-        int t_parent = (parent-1)/2;
-        T temp_value = data[parent];
-        data[parent] = data[t_parent];
-        data[t_parent] = temp_value;
-        parent = t_parent;
-    }
+  while (parent != 0 && comp(data[(parent - 1)/2], data[parent])) {
+    int t_parent = (parent-1)/2;
+    T temp_value = data[parent];
+    data[parent] = data[t_parent];
+    data[t_parent] = temp_value;
+    parent = t_parent;
+  }
 }
 
 template<class T, class CompareFunc>
 T BinaryHeap<T, CompareFunc>::pop() {
-    if (size == 0) {
-        std::cout << "ERROR: Trying to pop from an empty heap!" << std::endl;
-        return T();
+  if (size == 0) {
+    std::cout << "ERROR: Trying to pop from an empty heap!" << std::endl;
+    return T();
+  }
+  T to_return = data[0];
+  size--;
+  data[0] = data[size];
+  int current = 0;
+  int next = 0;
+  while (next < size-2) {
+    if (comp(data[current], data[next+1])) {
+      if (comp(data[next+1], data[next+2])) {
+        int temp = data[current];
+        data[current] = data[next+2];
+        data[next+2] = temp;
+        current = next+2;
+      } else {
+        int temp = data[current];
+        data[current] = data[next+1];
+        data[next+1] = temp;
+        current = next+1;
+      }
+    } else if (comp(data[current], data[next+2])) {
+      int temp = data[current];
+      data[current] = data[next+2];
+      data[next+2] = temp;
+      current = next+2;
+    } else {
+      break;
     }
-    T to_return = data[0];
-    size--;
-    data[0] = data[size];
-    int current = 0;
-    int next = 0;
-    while (next < size-2) {
-        if (comp(data[current], data[next+1])) {
-                if (comp(data[next+1], data[next+2])) {
-                    int temp = data[current];
-                    data[current] = data[next+2];
-                    data[next+2] = temp;
-                    current = next+2;
-                } else {
-                    int temp = data[current];
-                    data[current] = data[next+1];
-                    data[next+1] = temp;
-                    current = next+1;
-                }
-        } else if (comp(data[current], data[next+2])) {
-            int temp = data[current];
-            data[current] = data[next+2];
-            data[next+2] = temp;
-            current = next+2;
-        } else {
-            break;
-        }
-        next = current*2;
-    }
-    return to_return;
+    next = current*2;
+  }
+  return to_return;
 }
 
 template<class T, class CompareFunc>
 T BinaryHeap<T, CompareFunc>::top() const {
-    return data[0];
+  return data[0];
 }
 
 template<class T, class CompareFunc>
 int BinaryHeap<T, CompareFunc>::getSize() const {
-    return size;
+  return size;
 }
 
 template<class T, class CompareFunc>
 bool BinaryHeap<T, CompareFunc>::isFull() const {
-    return size == capacity;
+  return size == capacity;
 }
 
 template<class T, class CompareFunc>
 void BinaryHeap<T, CompareFunc>::shrinkToFit() {
-    T* temp_data = new T[size];
-    for (int i = 0; i < size; i++) {
-        temp_data[i] = data[i];
-    }
-    delete data;
-    data = temp_data;
-    capacity = size;
+  T* temp_data = new T[size];
+  for (int i = 0; i < size; i++)
+    temp_data[i] = data[i];
+  delete data;
+  data = temp_data;
+  capacity = size;
 }
 
 template<class T, class CompareFunc>
 void BinaryHeap<T, CompareFunc>::grow() {
-    capacity = capacity * 2;
-    T* temp_data = new T[capacity];
-    for (int i = 0; i < size; i++) {
-        temp_data[i] = data[i];
-    }
-    delete data;
-    data = temp_data;
+  capacity = capacity * 2;
+  T* temp_data = new T[capacity];
+  for (int i = 0; i < size; i++)
+    temp_data[i] = data[i];
+  delete data;
+  data = temp_data;
 }
 
 #endif  // BINARYHEAP_H_
