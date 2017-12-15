@@ -118,54 +118,42 @@ bool StringTrie::contains(const std::string &word) {
 
 //
 void StringTrie::remove(const std::string &word) {
-    std::map<char, StringTrieNode*>* current_map = &head->m_paths;
-    std::map<char, StringTrieNode*>* parent_map = &head->m_paths;
-    std::vector<StringTrieNode*> potential_deletions;
     StringTrieNode* current_node = head;
-    int size = word.size();
     const char* c_string_word = word.c_str();
-    char key_char = -1;
-    for (int i = 0; i < size; i++) {
-        potential_deletions.push_back(current_node);
-        key_char = tolower(c_string_word[i]);
-        if (current_map->find(key_char) == current_map->end()) {
+
+    // find node containing final character of string
+    for (int i = 0, length = word.length(); i < length; i++) {
+        char key_char = tolower(c_string_word[i]);
+        current_node = current_node->getSuffixNode(key_char);
+        if (current_node == nullptr) {
             printf("%s is not a word in the trie\n", c_string_word);
             return;
         }
-        current_node = current_map->at(key_char);
-        current_map = &current_node->m_paths;
     }
-    potential_deletions.push_back(current_node);
 
-    while (potential_deletions.size() >= 1) {
-        current_node = potential_deletions.back();
-        potential_deletions.pop_back();
-        parent_map = &potential_deletions.back()->m_paths;
+    current_node->is_a_word = false;
 
-        if (current_node->m_paths.size() == 0) {
-            parent_map->at(key_char) = nullptr;
-            delete current_node;
-        } else {
-            current_node->is_a_word = false;
-            return;
-        }
+    // delete current node and any parent nodes that have no other child nodes
+    while (current_node != head) {
+        StringTrieNode* parent = current_node->parent;
+        if (current_node->m_paths.size() != 0) return;
+        parent->m_paths.erase(current_node->data);
+        delete current_node;
+        current_node = parent;
     }
 }
 
 void StringTrie::removeAllWithPrefix(const std::string &prefix) {
-    std::map<char, StringTrieNode*>* current_map = &head->m_paths;
     StringTrieNode* current_node = head;
     const char* c_string_prefix = prefix.c_str();
-    char key_char = -1;
-    int size = prefix.length();
-    for (int i = 0; i < size; i++) {
-        key_char = tolower(c_string_prefix[i]);
-        if (current_map->find(key_char) == current_map->end()) {
+
+    for (int i = 0, length = prefix.length(); i < length; i++) {
+        char key_char = tolower(c_string_prefix[i]);
+        current_node = current_node->getSuffixNode(key_char);
+        if (current_node == nullptr) {
             std::cout << "\nNo words with prefix: " << prefix << std::endl;
             return;
         }
-        current_node = current_map->at(key_char);
-        current_map = &current_node->m_paths;
     }
     removeSubTrie(current_node);
 }
