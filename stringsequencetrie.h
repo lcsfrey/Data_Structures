@@ -37,11 +37,18 @@ class StringSequenceTrieNode {
   StringSequenceTrieNode(StringTrieNode* string_trie_node,
                          StringSequenceTrieNode* parent);
 
+  inline bool containsNextWord(StringTrieNode* word) const {
+    return m_next_word.find(word) != m_next_word.end();
+  }
+
+  inline void addChild(StringTrieNode* word) {
+    m_next_word[word] = new StringSequenceTrieNode(word, this);
+  }
   inline void addOneTimeSeen() { m_times_seen += 1; }
 
-  inline int getTimesSeen() { return m_times_seen; }
+  inline int getTimesSeen() const { return m_times_seen; }
 
-  std::string getWord();
+  inline const StringTrieNode* getWordNode() const { return m_trie_word_node; }
 
   friend class StringSequenceTrie;
 
@@ -52,10 +59,13 @@ class StringSequenceTrieNode {
   // pointer to previous word in sequence
   const StringSequenceTrieNode* m_parent;
 
+  // hash table of all possible next words
   std::unordered_map<StringTrieNode*, StringSequenceTrieNode*> m_next_word;
 
+  // number of times the sequence has been seen
   int m_times_seen;
 };
+
 
 class StringSequenceTrie : StringTrie {
  public:
@@ -86,7 +96,7 @@ class StringSequenceTrie : StringTrie {
       int frequency_upper_limit = INT32_MAX,
       int frequency_lower_limit = 0) const;
 
-  void printMostFrequentSequences(int limit = 1000);
+  void printMostFrequentSequences(int limit = 1000) const;
 
   // returns a sequence of strings one string at a time from the last node;
   std::string buildSequenceFromFinalNode(const StringSequenceTrieNode* current) const;

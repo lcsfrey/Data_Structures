@@ -71,8 +71,8 @@ void StringSequenceTrie::addSequence(std::vector<std::string> &sequence,
     current_trie_node = nullptr;
     for (int k = i; k < i + window_size; k++) {
       current_trie_node = m_trie->getNode(sequence[k]);
-      if (current_sequence_node->m_next_word.find(current_trie_node) == current_sequence_node->m_next_word.end()) {
-        current_sequence_node->m_next_word[current_trie_node] = new StringSequenceTrieNode(current_trie_node, parent);
+      if (!current_sequence_node->containsNextWord(current_trie_node)) {
+        current_sequence_node->addChild(current_trie_node);
         current_sequence_node = current_sequence_node->m_next_word[current_trie_node];
       } else {
         current_sequence_node = current_sequence_node->m_next_word[current_trie_node];
@@ -122,9 +122,9 @@ void StringSequenceTrie::getOrderedWordsHelper(
 
   std::vector<StringSequenceTrieNode*> words;
 
-  for (const std::pair<StringTrieNode*, StringSequenceTrieNode*> &pair : current_node->m_next_word) {
-    words.push_back(pair.second);
-  }
+  for (const auto &next_word : current_node->m_next_word)
+    words.push_back(next_word.second);
+
 
   if (words.size() == 0) return;
 
@@ -149,15 +149,12 @@ void StringSequenceTrie::getOrderedWordsHelper(
 }
 
 void StringSequenceTrie::printOrderedWords(const std::string sequence,
-                                           int sequence_length_upper_limit,
-                                           int sequence_length_lower_limit,
-                                           int branching_factor,
-                                           int frequency_upper_limit,
-                                           int frequency_lower_limit) const {
+    int sequence_length_upper_limit, int sequence_length_lower_limit,
+    int branching_factor, int frequency_upper_limit,
+    int frequency_lower_limit) const {
+
   std::vector<StringSequenceTrieNode*> sequences = getOrderedWords(sequence,
-      sequence_length_upper_limit,
-      sequence_length_lower_limit,
-      branching_factor);
+      sequence_length_upper_limit, sequence_length_lower_limit, branching_factor);
 
   if (sequence != "")
     std::cout << "Showing sequences starting with \"" << sequence << "\"\n";
@@ -165,28 +162,23 @@ void StringSequenceTrie::printOrderedWords(const std::string sequence,
   std::cout << "Rank  | Frequency | String" << std::endl
             << "------|-----------|-------" << std::endl;
 
-  int i = 1;
-  for (const StringSequenceTrieNode* sequence : sequences)
-    if (sequence->m_times_seen >= frequency_lower_limit
-            && sequence->m_times_seen <= frequency_upper_limit)
-      std::cout << std::setw(5) << i++ << std::setw(2)
-            << "|" << std::setw(10) << sequence->m_times_seen << std::setw(2)
-            << "|" << buildSequenceFromFinalNode(sequence) << std::endl;
-
+  for (int i = 0; i < (int)sequences.size(); i++)
+    if (sequences[i]->m_times_seen >= frequency_lower_limit &&
+        sequences[i]->m_times_seen <= frequency_upper_limit)
+      std::cout << std::setw(5) << i++ << std::setw(2) << "|" << std::setw(10)
+                << sequences[i]->m_times_seen << std::setw(2) << "|"
+                << buildSequenceFromFinalNode(sequences[i]) << std::endl;
 }
 
-void StringSequenceTrie::printMostFrequentSequences(int limit) {
+void StringSequenceTrie::printMostFrequentSequences(int limit) const {
   std::vector<StringSequenceTrieNode*> sequences = getOrderedWords();
   std::cout << "Rank  | Frequency | String" << std::endl
-        << "------|-----------|-------" << std::endl;
+            << "------|-----------|-------" << std::endl;
 
-  int i = 1;
-  for (int i = 0; i < limit && i < sequences.size(); i++) {
-      std::cout << std::setw(5) << i++ << std::setw(2)
-            << "|" << std::setw(10) << sequences[i]->m_times_seen << std::setw(2)
-            << "|" << buildSequenceFromFinalNode(sequences[i]) << std::endl;
-    if (i >= limit) return;
-  }
+  for (int i = 0; i < limit && i < (int)sequences.size(); i++)
+    std::cout << std::setw(5) << i << std::setw(2) << "|" << std::setw(10)
+              << sequences[i]->m_times_seen << std::setw(2) << "|"
+              << buildSequenceFromFinalNode(sequences[i]) << std::endl;
 }
 
 std::string StringSequenceTrie::buildSequenceFromFinalNode(const StringSequenceTrieNode *current) const {
@@ -200,24 +192,25 @@ std::string StringSequenceTrie::buildSequenceFromFinalNode(const StringSequenceT
 
 void StringSequenceTrie::writeToFile(std::string filename) const {
   std::ofstream outfile(filename);
-  if (!outfile.is_open()) {
+  if (!outfile.is_open())
     std::cout << "ERROR: Couldn't open " + filename << std::endl;
-  }
+
   int branches = 0;
-  branches = this->head->m_next_word.size();
+  branches = head->m_next_word.size();
   outfile << branches << std::endl;
-  for(const auto starting_word : head->m_next_word) {
+  for(const auto &starting_word : head->m_next_word)
     writeToFileHelper(outfile, starting_word.second);
-  }
+
   outfile.close();
 }
 
 void StringSequenceTrie::writeToFileHelper(std::ofstream &outfile,
-                       const StringSequenceTrieNode *current_node) const {
+    const StringSequenceTrieNode *current_node) const {
+
   int current_size = current_node->m_next_word.size();
   outfile << buildStringFromFinalNode(current_node->m_trie_word_node) << " "
-      << current_node->m_times_seen << " "
-      << current_size << " ";
+          << current_node->m_times_seen << " "
+          << current_size << " ";
 
   if (current_size != 0)
     for(const auto starting_word : current_node->m_next_word)
@@ -228,14 +221,13 @@ void StringSequenceTrie::writeToFileHelper(std::ofstream &outfile,
 
 void StringSequenceTrie::readFromFile(std::string filename) {
   std::ifstream infile(filename);
-  if (!infile.is_open()) {
+  if (!infile.is_open())
     std::cout << "ERROR: Couldn't open " + filename << std::endl;
-  }
+
   int branches = 0;
   infile >> branches;
-  for (int i = 0; i < branches; i++) {
+  for (int i = 0; i < branches; i++)
     readFromFileHelper(infile, head);
-  }
 }
 
 void StringSequenceTrie::readFromFileHelper(std::ifstream &infile,
@@ -244,22 +236,25 @@ void StringSequenceTrie::readFromFileHelper(std::ifstream &infile,
   std::string current_str;
   int current_frequency = 0;
   int current_branches = 0;
+
+  // read in one node from file
   infile >> current_str >> current_frequency >> current_branches;
-  if (m_trie->contains(current_str)) {
-    current_trie_node = m_trie->getNode(current_str);
-  } else {
+
+  // add word to trie if not already there
+  if (!m_trie->contains(current_str))
     m_trie->addWord(current_str);
-    current_trie_node = m_trie->getNode(current_str);
-  }
-  if (current_node->m_next_word.find(current_trie_node) == current_node->m_next_word.end()) {
-    current_node->m_next_word[current_trie_node] = new StringSequenceTrieNode(current_trie_node,
-                        current_node);
-  }
+
+  // get pointer to word
+  current_trie_node = m_trie->getNode(current_str);
+
+  if (!current_node->containsNextWord(current_trie_node))
+    current_node->addChild(current_trie_node);
+
   current_node->m_next_word[current_trie_node]->m_times_seen += current_frequency - 1;
 
-  for (int i = 0; i < current_branches; i++) {
+  //recursively call self on all child nodes
+  for (int i = 0; i < current_branches; i++)
     readFromFileHelper(infile, current_node->m_next_word[current_trie_node]);
-  }
 }
 
 
@@ -287,8 +282,8 @@ void StringSequenceTrie::addSequenceHelper(const std::string &sequence,
   m_trie->addWord(str);
   current_trie_node = m_trie->getNode(str);
 
-  if (current_sequence_node->m_next_word.find(current_trie_node) == current_sequence_node->m_next_word.end()) {
-    current_sequence_node->m_next_word[current_trie_node] = new StringSequenceTrieNode(current_trie_node, parent);
+  if (!current_sequence_node->containsNextWord(current_trie_node)) {
+    current_sequence_node->addChild(current_trie_node);
     current_sequence_node = current_sequence_node->m_next_word[current_trie_node];
   } else {
     current_sequence_node = current_sequence_node->m_next_word[current_trie_node];
@@ -318,43 +313,38 @@ StringSequenceTrieNode* StringSequenceTrie::getNode(const std::string &sequence)
     // find the next space in the sentence
     space_index = sequence.find(" ", current_pos);
     // check and verify there is a space in the string, else return
-    if (space_index < size) {
+    if (space_index < size)
       str = sequence.substr(current_pos, space_index - current_pos);
-    } else {
+    else
       str = sequence.substr(current_pos, size - current_pos);
-    }
+
     current_pos = space_index + 1;
 
     // check if the word is in m_trie
     // if it is not, then it wouldn't be in the sequence record
     current_trie_node = m_trie->getNode(str);
-    if (current_trie_node == nullptr) {
-      return nullptr;
-    }
+    if (current_trie_node == nullptr) return nullptr;
 
-    if (current_record_node->m_next_word.find(current_trie_node) == current_record_node->m_next_word.end()) {
+    if (!current_record_node->containsNextWord(current_trie_node))
       return nullptr;
-    } else {
+    else
       current_record_node = current_record_node->m_next_word[current_trie_node];
-    }
   } while (space_index < size);
+
   return current_record_node;
 }
 
-
 bool isPunctNotPeriod(const char &c) {
-  if (std::ispunct(c) && c != '.') {
+  if (std::ispunct(c) && c != '.')
     return true;
-  } else {
+  else
     return false;
-  }
 }
 
 void cleanString(std::string &str) {
   std::string output;
-  std::remove_copy_if(str.begin(), str.end(),
-              std::back_inserter(output),
-              std::ptr_fun(isPunctNotPeriod));
+  std::remove_copy_if(str.begin(), str.end(), std::back_inserter(output),
+                      std::ptr_fun(isPunctNotPeriod));
   str.assign(std::move(output));
 }
 
@@ -363,9 +353,10 @@ void StringSequenceTrie::loadTextFile(std::string file_name, int window_size) {
   else file_name = "books/" + file_name;
   std::ifstream my_file;
   my_file.open(file_name);
-  if(!my_file.is_open()){
+
+  if(!my_file.is_open())
     std::cout << "File in trieTest() didn't open!\n";
-  }
+
   std::cout << "Now Loading " << file_name << "...\n";
 
   std::string temp_word;
@@ -382,7 +373,6 @@ void StringSequenceTrie::loadTextFile(std::string file_name, int window_size) {
       sequence += " " + temp_word;
       count++;
     }
-
   }
 
   addSequence(sequence);

@@ -32,7 +32,7 @@
 #include "linkedlist.h"
 #include "binaryheap.h"
 #include "skiplist.h"
- #include "stringsequencetrie.h"
+#include "stringsequencetrie.h"
 
 using namespace std;
 void testMenu();
