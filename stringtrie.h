@@ -176,7 +176,7 @@ class StringRecord {
   int getNumberOccurences(const StringTrieNode *current_node) const;
 
   // returns ordered list of occurences
-  std::vector<int> getOrderedOccurences();
+  std::vector<int> getOrderedOccurences() const;
 
   // returns map of associating StringTrieNode pointers and their frequency
   inline const std::unordered_map<const StringTrieNode*, int>* getRecord() {
