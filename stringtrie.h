@@ -173,6 +173,8 @@ class StringRecord {
   // or increment value (occurences) if already in map
   void addWord(const StringTrieNode* current_node, int occurences = 1);
 
+  void removeWord(const StringTrieNode* current_node);
+
   int getNumberOccurences(const StringTrieNode *current_node) const;
 
   // returns ordered list of occurences

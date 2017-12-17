@@ -42,8 +42,17 @@ StringTrieNode::StringTrieNode(const char &input_char)
 StringTrieNode::~StringTrieNode() {}
 
 void StringTrie::removeSubTrie(StringTrieNode* current) {
-  for (const std::pair<char, StringTrieNode*>& iter : current->m_paths)
-    removeSubTrie(iter.second);
+  for (const std::pair<char, StringTrieNode*>& pair : current->m_paths)
+    removeSubTrie(pair.second);
+
+  if (current->is_a_word) {
+    number_of_total_words -= m_record->getNumberOccurences(current);
+    number_of_unique_words--;
+    m_record->removeWord(current);
+  }
+
+  if (current != head) current->parent->m_paths.erase(current->data);
+
   delete current;
 }
 
@@ -67,10 +76,10 @@ void StringTrie::resetTrie() {
 
 void StringTrie::addWord(const std::string &word) {
   if (word == "" || word == " ") return;
+
   StringTrieNode* current_node = head;
   const char* c_string_word = word.c_str();
-  int size = word.length();
-  for (int i = 0; i < size; i++) {
+  for (int i = 0, length = word.length(); i < length; i++) {
     char key_char = tolower(c_string_word[i]);
     if (!current_node->hasSuffixNode(key_char)) {
       current_node->m_paths[key_char] = new StringTrieNode(key_char);
@@ -93,8 +102,7 @@ bool StringTrie::contains(const std::string &word) {
   for (int i = 0, length = word.length(); i < length; i++) {
     char key_char = tolower(c_string_word[i]);
     current_node = current_node->getSuffixNode(key_char);
-    if (current_node == nullptr)
-      return false;
+    if (current_node == nullptr) return false;
   }
 
   if (current_node->is_a_word)
@@ -138,7 +146,7 @@ void StringTrie::removeAllWithPrefix(const std::string &prefix) {
     char key_char = tolower(c_string_prefix[i]);
     current_node = current_node->getSuffixNode(key_char);
     if (current_node == nullptr) {
-      std::cout << "\nNo words with prefix: " << prefix << std::endl;
+      std::cerr << "ERROR: No words with prefix: " << prefix << std::endl;
       return;
     }
   }
@@ -159,7 +167,7 @@ void StringTrie::printAllWithPrefix(const std::string &prefix) const {
     key_char = tolower(c_string_prefix[i]);
     current_node = current_node->getSuffixNode(key_char);
     if (current_node == nullptr) {
-      std::cout << "\nNo words with prefix: " << prefix << std::endl;
+      std::cerr << "ERROR: No words with prefix: " << prefix << std::endl;
       return;
     }
   }
@@ -191,16 +199,15 @@ void StringTrie::printTopOccurences(int limit) {
 }
 
 void StringTrie::writeToFile(std::string filename) const {
-  std::ofstream infile(filename);
-  if (!infile.is_open()) {
-    std::cout << "ERROR: " << filename << " could not be opened.\n";
+  std::ofstream outfile(filename);
+  if (!outfile.is_open()) {
+    std::cerr << "ERROR: " << filename << " could not be opened.\n";
     return;
   }
-  infile << head->m_paths.size() << " "
-         << this->number_of_unique_words << " "
-         << this->number_of_total_words << " ";
+  outfile << head->m_paths.size() << " " << this->number_of_unique_words << " "
+          << this->number_of_total_words << " ";
   for (const std::pair<char, StringTrieNode*> &pair : head->m_paths)
-    writeToFileHelper(infile, pair.second);
+    writeToFileHelper(outfile, pair.second);
 }
 
 void StringTrie::writeToFileHelper(std::ofstream &outfile,
@@ -215,7 +222,7 @@ void StringTrie::writeToFileHelper(std::ofstream &outfile,
 void StringTrie::readFromFile(std::string filename) {
   std::ifstream infile(filename);
   if (!infile.is_open()) {
-    std::cout << "ERROR: " << filename << " could not be opened.\n";
+    std::cerr << "ERROR: " << filename << " could not be opened.\n";
     return;
   }
   int current_size = 0;
@@ -246,9 +253,7 @@ void StringTrie::readFromFileHelper(std::ifstream &infile,
 // prints all words in subtree,
 // word is built up one character at a time with each rescursive call
 void StringTrie::printAllHelper(StringTrieNode* current, std::string word) const {
-  if (current->is_a_word) {
-    std::cout << word << std::endl;
-  }
+  if (current->is_a_word) printf("%s\n", word);
   for (const auto& t_pair : current->m_paths)
     printAllHelper(t_pair.second, word + t_pair.first);
 }
@@ -263,11 +268,10 @@ int StringTrie::getNumberUniqueWords() const {
 
 int StringTrie::getNumberOccurences(const std::string &word) {
   StringTrieNode* word_node = getNode(word);
-  if (word_node != nullptr) {
+  if (word_node != nullptr)
     return m_record->getNumberOccurences(word_node);
-  } else {
+  else
     return 0;
-  }
 }
 
 std::string StringTrie::getLongestWord() const {
@@ -360,6 +364,10 @@ void StringRecord::addWord(const StringTrieNode *current_node, int occurences) {
     m_record[current_node] = occurences;
   else
     m_record[current_node] += occurences;
+}
+
+void StringRecord::removeWord(const StringTrieNode *current_node) {
+  m_record.erase(current_node);
 }
 
 int StringRecord::getNumberOccurences(const StringTrieNode *current_node) const {
