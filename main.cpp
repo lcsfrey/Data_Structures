@@ -46,10 +46,6 @@ void storeBookInTrie(StringTrie &book);
 void printLicense();
 
 int main() {
-  StringTrie trie;
-  storeBookInTrie(trie);
-  trie.printTopOccurences(10);
-
   srand(time(0));
   printLicense();
   testMenu();
@@ -66,34 +62,17 @@ void testMenu() {
     cout << "3 - Binary Tree\n";
     cout << "4 - String Trie\n";
     cout << "5 - Sequence Trie\n";
-    cout << "6 - Binary Heap";
-    cout << "\n";
+    cout << "6 - Binary Heap\n";
     cin >> choice;
-    cout << endl;
     switch (choice) {
-      case 0:
-        break;
-      case 1:
-        linkedListTest();
-        break;
-      case 2:
-        skipListTest();
-        break;
-      case 3:
-        binaryTreeTest();
-        break;
-      case 4:
-        trieTest();
-        break;
-      case 5:
-        sequenceTrieTest();
-        break;
-      case 6:
-        heapTest();
-        break;
-      default:
-        cout << "Invalid choice!\n";
-        break;
+      case 0: break;
+      case 1: linkedListTest(); break;
+      case 2: skipListTest(); break;
+      case 3: binaryTreeTest(); break;
+      case 4: trieTest(); break;
+      case 5: sequenceTrieTest(); break;
+      case 6: heapTest(); break;
+      default: cout << "Invalid choice!\n"; break;
     }
   }
 }
@@ -101,9 +80,6 @@ void testMenu() {
 void linkedListTest() {
   LinkedList<int> my_linked_list;
   int choice = -1;
-  int list_input = 0;
-  int index = 0;
-
   while (choice != 0) {
     cout << "----------------Linked List Test----------------" << endl;
     cout << "Select test method:\n";
@@ -117,7 +93,9 @@ void linkedListTest() {
     cout << "7 - Find number\n";
     cout << "8 - Print numbers\n";
     cin >> choice;
-    cout << endl;
+
+    int index = 0;
+    int list_input = 0;
     switch (choice) {
       case 0:
         break;
@@ -168,9 +146,8 @@ void linkedListTest() {
 }
 
 void trieTest() {
-  int choice = -1;
-  string temp_word = "";
   StringTrie my_string_trie;
+  int choice = -1;
   while (choice != 0) {
     cout << "\n----------------Trie Test----------------" << endl;
     cout << "Select test method:\n";
@@ -190,6 +167,8 @@ void trieTest() {
     cout << "13 - Get length of shortest word\n";
     cout << "14 - Get length of longest word\n";
     cin >> choice;
+
+    string temp_word = "";
     switch (choice) {
       case 0:
         break;
@@ -278,22 +257,19 @@ void trieTest() {
   }
 }
 
-void sequenceTrieTestPrintHelper(const StringSequenceTrie &my_string_sequence_trie) {
-  int upper_freq_limit = INT32_MAX;
-  int lower_freq_limit = 1;
-  int upper_length_limit = INT32_MAX;
-  int lower_length_limit = 1;
+void sequenceTrieTestPrintHelper(StringSequenceTrie &my_sequence_trie) {
+  StringSequenceTrie::SequenceCriteria criteria;
   string starting_sequence;
   int choice = -1;
   do {
     cout << "\n----------------Print sequences by occurence----------------\n"
        << "Starting sequence: \"" << starting_sequence << "\"\n"
-       << "Upper frequency limit: " << upper_freq_limit << " occurences\n"
-       << "Lower frequency limit: " << lower_freq_limit
-       << " occurence" + (lower_freq_limit > 1 ? string("s\n") : string("\n"))
-       << "Upper word count limit: " << upper_length_limit << " words\n"
-       << "Lower word count limit: " << lower_length_limit
-       << " word"  + (lower_length_limit > 1 ? string("s\n\n") : string("\n\n"))
+       << "Upper frequency limit: " << criteria.m_frequency_max << " occurences\n"
+       << "Lower frequency limit: " << criteria.m_frequency_min
+       << " occurence" + (criteria.m_frequency_min > 1 ? string("s\n") : string("\n"))
+       << "Upper word count limit: " << criteria.m_length_max_count<< " words\n"
+       << "Lower word count limit: " << criteria.m_length_min_count
+       << " word"  + (criteria.m_length_min_count > 1 ? string("s\n\n") : string("\n\n"))
        << "0 - Back\n"
        << "1 - Edit starting sequence\n"
        << "2 - Edit upper frequency limit\n"
@@ -308,37 +284,34 @@ void sequenceTrieTestPrintHelper(const StringSequenceTrie &my_string_sequence_tr
       case 1:
         cout << "Enter starting sequence: ";
         std::getline(std::cin, starting_sequence);
+        criteria.setStartingSequence(starting_sequence);
         break;
       case 2:
         cout << "Enter upper frequency limit: ";
-        cin >> upper_freq_limit;
+        cin >> criteria.m_frequency_max;
         break;
       case 3:
         cout << "Enter lower frequency limit: ";
-        cin >> lower_freq_limit;
+        cin >> criteria.m_frequency_min;
         break;
       case 4:
         cout << "Enter upper word count limit: ";
-        cin >> upper_length_limit;
+        cin >> criteria.m_length_max_count;
         break;
       case 5:
         cout << "Enter lower word count limit: ";
-        cin >> lower_length_limit;
+        cin >> criteria.m_length_min_count;
         break;
       case 6:
-        my_string_sequence_trie.printOrderedWords(starting_sequence, upper_length_limit,
-                                                  lower_length_limit, 10,
-                                                  upper_freq_limit, lower_freq_limit);
+        my_sequence_trie.printOrderedWords(criteria);
         break;
     }
   } while (choice != 0);
 }
 
 void sequenceTrieTest() {
-  int choice(-1);
-  string sequence("");
-  string filename("");
-  StringSequenceTrie my_string_sequence_trie;
+  StringSequenceTrie my_sequence_trie;
+  int choice = -1;
   while (choice != 0) {
     cout << "\n----------------Sequence Trie Test----------------" << endl;
     cout << "Select test method:\n";
@@ -348,26 +321,28 @@ void sequenceTrieTest() {
     cout << "3 - Print all sequences ordered by occurence\n";
     cout << "4 - Print sequences by occurences in range\n";
     cin >> choice;
+    string sequence, filename;
     switch (choice) {
       case 0:
         break;
       case 1:
         cout << "Enter full name of text file: ";
         cin >> filename;
-        my_string_sequence_trie.loadTextFile(filename);
+        my_sequence_trie.loadTextFile(filename);
         break;
       case 2:
         cout << "Enter sequence: ";
         cin >> sequence;
-        my_string_sequence_trie.addSequence(sequence);
+        my_sequence_trie.addSequence(sequence);
         break;
-      case 3:
-        my_string_sequence_trie.printOrderedWords("",INT32_MAX,1,10,INT32_MAX,1);
+      case 3: {
+        StringSequenceTrie::SequenceCriteria criteria;
+        my_sequence_trie.printOrderedWords(criteria);
         break;
-      case 4: {
-        sequenceTrieTestPrintHelper(my_string_sequence_trie);
+        }
+      case 4:
+        sequenceTrieTestPrintHelper(my_sequence_trie);
         break;
-      }
       default:
         cout << "Invalid choice!\n";
         break;
@@ -379,8 +354,6 @@ void sequenceTrieTest() {
 void binaryTreeTest() {
   BinaryTree<int> my_binary_tree;
   int choice = -1;
-  int tree_input = 0;
-
   while (choice != 0) {
     cout << "----------------Binary Tree Test----------------" << endl;
     cout << "Select test method:\n";
@@ -392,7 +365,8 @@ void binaryTreeTest() {
     cout << "5 - Get largest number\n";
     cout << "6 - Print numbers in ascending order\n";
     cin >> choice;
-    cout << endl;
+
+    int tree_input = 0;
     switch (choice) {
       case 0:
         break;
@@ -448,7 +422,6 @@ void heapTest() {
     cout << "5 - Get largest number\n";
     cout << "6 - Add random values\n";
     cin >> choice;
-    cout << endl;
     switch (choice) {
       case 0:
         break;
@@ -502,7 +475,6 @@ void heapTest() {
 void skipListTest() {
   SkipList<int> my_skiplist;
   int choice = -1;
-  int list_input = 0;
   while (choice != 0) {
     cout << "----------------Skip List Test----------------" << endl;
     cout << "Select test method:\n";
@@ -513,7 +485,8 @@ void skipListTest() {
     cout << "4 - Add random numbers\n";
     cout << "5 - Print numbers\n";
     cin >> choice;
-    cout << endl;
+
+    int list_input = 0;
     switch (choice) {
       case 0:
         break;
@@ -568,12 +541,10 @@ void skipListTest() {
 }
 
 void storeBookInTrie(StringTrie &book) {
-
   string filename("GreatExpectations.txt");
-  ifstream myFile;
-  myFile.open(filename);
-  if (!myFile.is_open())
-    cout << "File in trieTest() didn't open!\n";
+  ifstream infile(filename);
+
+  if (!infile.is_open()) cerr << "ERROR: " + filename + "didn't open!\n";
 
   cout << "Now Loading " << filename << "...\n";
 
@@ -582,8 +553,8 @@ void storeBookInTrie(StringTrie &book) {
   char c;
   string temp_word;
   clock_t start = clock();
-  while (!myFile.eof()) {
-    myFile >> temp_word;
+  while (!infile.eof()) {
+    infile >> temp_word;
       if (temp_word == "----------------------------------------") {
       pageCount++;
       wordCount = 1;
@@ -597,7 +568,7 @@ void storeBookInTrie(StringTrie &book) {
     }
   }
   clock_t duration = clock() - start;
-  myFile.close();
+  infile.close();
   cout << "Time taken to build trie: " << duration / (double)CLOCKS_PER_SEC << " seconds." << endl;
   cout << "Number of unique keys in trie: " << book.getNumberUniqueWords() << endl;
   cout << "Number of total keys in trie: " << book.getNumberTotalWords() << endl;
