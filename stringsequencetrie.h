@@ -24,35 +24,44 @@
 **                                                                                 **
 ************************************************************************************/
 
-#ifndef STRINGSEQUENCETRIE_H
-#define STRINGSEQUENCETRIE_H
+#ifndef STRINGSEQUENCETRIE_H_
+#define STRINGSEQUENCETRIE_H_
 
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
+#include <list>
+#include <string>
 
 #include "stringtrie.h"
 
 class StringSequenceTrieNode {
  public:
   StringSequenceTrieNode(StringTrieNode* string_trie_node,
-                         StringSequenceTrieNode* parent);
+                         StringSequenceTrieNode *parent);
 
-  inline bool containsNextWord(StringTrieNode* word) const {
+  bool containsNextWord(StringTrieNode* word) const {
     return m_next_word.find(word) != m_next_word.end();
   }
 
-  inline void addChild(StringTrieNode* word) {
+  void addChild(StringTrieNode* word) {
     m_next_word[word] = new StringSequenceTrieNode(word, this);
+    addTimesSeen(1);
   }
-  inline void addOneTimeSeen() { m_times_seen += 1; }
 
-  inline int getTimesSeen() const { return m_times_seen; }
+  void addTimesSeen(const int occurences) { m_times_seen += occurences; }
 
-  inline const StringTrieNode* getWordNode() const { return m_trie_word_node; }
+  int getTimesSeen() const { return m_times_seen; }
+
+  const StringTrieNode* getWordNode() const { return m_trie_word_node; }
+
+  const StringSequenceTrieNode* getNextSequenceNode(StringTrieNode* next_word) {
+      return containsNextWord(next_word) ? m_next_word[next_word] : nullptr;
+  }
 
   friend class StringSequenceTrie;
 
-  protected:
+ protected:
   // current word in the sequence
   const StringTrieNode* m_trie_word_node;
 
@@ -67,34 +76,44 @@ class StringSequenceTrieNode {
 };
 
 
-class StringSequenceTrie : StringTrie {
+class StringSequenceTrie {
  public:
+
   StringSequenceTrie();
+
+  class SequenceCriteria {
+   public:
+    SequenceCriteria(){}
+    void setStartingSequence(std::string starting_sequence);
+
+    std::string m_starting_sequence = "";
+    // std::unordered_set<std::string> m_black_list_words;
+    int m_length_max_count = 3;
+    int m_length_min_count = 2;
+    int m_branching_factor = 50;
+    int m_frequency_max = INT32_MAX;
+    int m_frequency_min = 3;
+  };
 
   // add sequence of strings separated by spaces to trie
   void addSequence(const std::string &sequence);
 
   // add sequence of strings from vector to trie
-  void addSequence(std::vector<std::string> &sequence, int window_size = 5);
+  void addSequence(const std::vector<std::string> &sequence,
+                   int window_size = 5);
+
+  std::string getNextWord(std::string &sequence);
 
   // returns a vector of StringSequenceTrieNode pointers ordered by the number
-  // of times that node (the sequence ending with the word contained in that node)
-  // has been seen.
-  // The function can be restricted to only return nodes within a range of lengths.
-  // A branching factor can be specified which affects how many unique words at
-  // each branch will be checked.
+  // of times that node (the sequence ending with the word contained in that
+  // node has been seen.
+  // seqence_length_upper_limit - max number of words in the sequence
+  // seqence_length_lower_limit - minimum number of words in the sequence
+  // branching_factor - number of possible next words following the current word
   std::vector<StringSequenceTrieNode*> getOrderedWords(
-      const std::string sequence = "",
-      int sequence_length_upper_limit = INT32_MAX,
-      int sequence_length_lower_limit = 1,
-      int branching_factor = 5) const;
+      const SequenceCriteria &criteria) const;
 
-  void printOrderedWords(const std::string sequence = "",
-      int sequence_length_upper_limit = INT32_MAX,
-      int sequence_length_lower_limit = 1,
-      int branching_factor = 5,
-      int frequency_upper_limit = INT32_MAX,
-      int frequency_lower_limit = 0) const;
+  void printOrderedWords(const SequenceCriteria &criteria) const;
 
   void printMostFrequentSequences(int limit = 1000) const;
 
@@ -112,31 +131,32 @@ class StringSequenceTrie : StringTrie {
   StringSequenceTrieNode* getNode(const std::string &sequence) const;
 
   void addSequenceHelper(const std::string &sequence,
-      StringSequenceTrieNode *current_node,
-      int starting_pos = 0);
+      StringSequenceTrieNode *current_seq_node, std::size_t starting_pos = 0);
+
+  void addSequenceBackwardHelper(const std::string &sequence,
+      StringSequenceTrieNode *current_seq_node, std::size_t starting_pos = 0);
 
   void getOrderedWordsHelper(const StringSequenceTrieNode* current_node,
-      std::vector<StringSequenceTrieNode *> &sequences,
-      const int &sequence_length_upper_limit = INT32_MAX,
-      const int &sequence_length_lower_limit = 1,
-      int current_sequence_length = 0,
-      int branching_factor = 5) const;
+      std::vector<StringSequenceTrieNode *> *sequences,
+      const SequenceCriteria &criteria, int current_sequence_length) const;
 
  private:
-
   void readFromFileHelper(std::ifstream &infile,
-      StringSequenceTrieNode *current_node);
+      StringSequenceTrieNode *current_seq_node);
 
   void writeToFileHelper(std::ofstream &outfile,
       const StringSequenceTrieNode *current_node) const;
 
-  // contains dictionary of words that have been used
   StringTrie* m_trie;
 
-  StringSequenceTrieNode* head;
+  StringSequenceTrieNode* m_seq_head;
+
+  StringSequenceTrieNode* m_seq_backward_head;
 
   int m_total_words;
+
+  int m_window_size;
 };
 
 
-#endif // STRINGSEQUENCETRIE_H
+#endif  // STRINGSEQUENCETRIE_H_
