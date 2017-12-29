@@ -37,16 +37,33 @@
 
 class StringRecord;
 
-struct StringTrieNode {
+class StringTrieNode {
+ public:
+  // creates node containing input_char
+  explicit StringTrieNode(const char &input_char);
+  // deletes node and all children nodes in subtrie
+  ~StringTrieNode();
+
+  // returns true if input char is a valid suffix char
+  // (e.g. input char is a key value in m_paths)
+  inline bool hasSuffixNode(const char &input_char) const {
+    return m_paths.find(input_char) != m_paths.end();
+  }
+
+  // returns pointer to suffix node node if it exists
+  // returns nullptr if it does not exist
+  inline StringTrieNode* getSuffixNode(const char &input_char) {
+      return hasSuffixNode(input_char) ? m_paths[input_char] : nullptr;
+  }
+
+  friend class StringTrie;
+
+ protected:
   const char data;
   bool is_a_word;
   StringTrieNode* parent;
   // hash table containing pointers to all suffixes
   std::map<char, StringTrieNode*> m_paths;
-  // creates node containing input_char
-  explicit StringTrieNode(const char &input_char);
-  // deletes node and all children nodes in subtrie
-  ~StringTrieNode();
 };
 
 class StringTrie {
@@ -156,10 +173,12 @@ class StringRecord {
   // or increment value (occurences) if already in map
   void addWord(const StringTrieNode* current_node, int occurences = 1);
 
+  void removeWord(const StringTrieNode* current_node);
+
   int getNumberOccurences(const StringTrieNode *current_node) const;
 
   // returns ordered list of occurences
-  std::vector<int> getOrderedOccurences();
+  std::vector<int> getOrderedOccurences() const;
 
   // returns map of associating StringTrieNode pointers and their frequency
   inline const std::unordered_map<const StringTrieNode*, int>* getRecord() {
