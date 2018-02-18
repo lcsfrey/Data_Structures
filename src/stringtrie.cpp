@@ -24,7 +24,7 @@
 **                                                                                 **
 ************************************************************************************/
 
-#include "stringtrie.h"
+#include "../include/stringtrie.h"
 
 #include <vector>
 #include <queue>
@@ -42,7 +42,7 @@ StringTrieNode::StringTrieNode(const char &input_char)
 StringTrieNode::~StringTrieNode() {}
 
 void StringTrie::removeSubTrie(StringTrieNode* current) {
-  for (const std::pair<char, StringTrieNode*>& pair : current->m_paths)
+  for (std::pair<const char, StringTrieNode*> &pair : current->m_paths)
     removeSubTrie(pair.second);
 
   if (current->is_a_word) {
